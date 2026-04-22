@@ -1,1 +1,22 @@
+system-view
+sysname SPIR-Huawei-CORE
+undo info-center enable
+user-interface vty 0 4
+authentication-mode password
+set authentication password cipher Huawei@123
+protocol inbound all
+quit
+interface GigabitEthernet0/0/1
+description Uplink to ISP
+ip address 192.168.100.2 255.255.255.0
+quit
+interface Vlanif1
+ip address 192.168.1.2 255.255.255.0
+quit
+ip route-static 0.0.0.0 0.0.0.0 192.168.100.254
+snmp-agent sys-info location "Data Center"
+snmp-agent sys-info contact "admin@example.com"
+ntp-service unicast-server 1.pe.pool.ntp.org
+clock timezone PET -05:00:00
+save
 
