@@ -1,14 +1,13 @@
 # SPIR v7.0 - Sistema de Planificación Inteligente de Redes
 
-# 
-
 # Descripción
 
 SPIR (Sistema de Planificación Inteligente de Redes) es una aplicación web diseñada para la gestión, planificación y automatización de infraestructuras de red.
 
 Permite a los ingenieros de red planificar, desplegar, monitorear y auditar configuraciones, todo desde una interfaz interactiva y centralizada.
 
-
+## Objetivo
+Desarrollar una herramienta que facilite la planificación de redes y la automatización de tareas, integrando múltiples funcionalidades en una sola plataforma accesible desde el navegador.
 
 ## Características principales
 
@@ -23,8 +22,6 @@ Permite a los ingenieros de red planificar, desplegar, monitorear y auditar conf
 * Rollback de configuraciones
 * Exportación de reportes (PDF, JSON, CSV)
 
-
-
 ## Arquitectura del sistema
 
 El sistema está construido como una **Single Page Application (SPA)** en un único archivo HTML:
@@ -32,8 +29,6 @@ El sistema está construido como una **Single Page Application (SPA)** en un ún
 * **HTML:** estructura de la interfaz
 * **CSS:** estilos y diseño responsivo
 * **JavaScript:** lógica del sistema y simulación de operaciones
-
-
 
 ## Módulos del sistema
 
