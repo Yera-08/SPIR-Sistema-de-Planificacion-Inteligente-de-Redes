@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Planner AI - Planificación y Automatización de Redes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --secondary: #20c997;
+            --accent: #ff6b6b;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --border: #e9ecef;
+            --text: #2d3748;
+            --text-light: #718096;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Header Premium */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: cover;
+            animation: wave 15s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(1200px); }
+        }
+
+        header .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        header h1 {
+            font-size: 3.2em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 .icon {
+            font-size: 1.1em;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        header .subtitle {
+            font-size: 1em;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        /* Navigation Tabs */
+        .tabs-nav {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid var(--border);
+            gap: 0;
+            padding: 0 40px;
+            overflow-x: auto;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button {
+            flex: 0 0 auto;
+            padding: 18px 28px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 3px solid transparent;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab-button i {
+            font-size: 1.1em;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        }
+
+        .tab-content {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .tab-content.active {
+            display: grid;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .section:hover {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 24px;
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2 i {
+            font-size: 1.3em;
+        }
+
+        .section h3 {
+            color: var(--primary-dark);
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            width: auto;
+            margin-right: 10px;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #17a2b8 100%);
+        }
+
+        button i {
+            font-size: 1.1em;
+        }
+
+        /* Results Section */
+        .results {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+            grid-column: 1 / -1;
+        }
+
+        .results h2 {
+            color: var(--primary);
+            margin-bottom: 24px;
+            font-size: 1.5em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results h3 {
+            color: var(--primary-dark);
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .alert i {
+            font-size: 1.2em;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left-color: #17a2b8;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left-color: #ffc107;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95em;
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(40, 167, 69, 0.15);
+            color: #155724;
+        }
+
+        .badge-error {
+            background: rgba(220, 53, 69, 0.15);
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #856404;
+        }
+
+        .badge-info {
+            background: rgba(23, 162, 184, 0.15);
+            color: #0c5460;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 16px 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .metric-label {
+            color: var(--text-light);
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .metric-subtext {
+            font-size: 0.85em;
+            color: var(--text-light);
+        }
+
+        /* Device List */
+        .device-list {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            max-height: 350px;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .device-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .device-item:last-child {
+            border-bottom: none;
+        }
+
+        .device-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .device-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        /* Output Box */
+        .output-box {
+            background: #1a1a2e;
+            color: #00ff00;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 350px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .output-box::before {
+            content: '$ ';
+            color: #00ff00;
+            margin-right: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content, .tab-content {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-column: 1;
+            }
+
+            header {
+                padding: 40px 30px;
+            }
+
+            header h1 {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content, .tab-content {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            header {
+                padding: 30px 20px;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .tabs-nav {
+                padding: 0 20px;
+            }
+
+            .section {
+                padding: 24px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                padding: 10px 20px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="content">
+                <h1><i class="fas fa-network-wired icon"></i> Network Planner AI</h1>
+                <p>Planificación y Automatización Inteligente de Redes</p>
+                <div class="subtitle">Genera configuraciones de red automáticamente con IA - Etapas 1 y 2</div>
+            </div>
+        </header>
+
+        <div class="tabs-nav">
+            <button class="tab-button active" onclick="switchTab(event, 'planning')">
+                <i class="fas fa-chart-bar"></i> Planificación
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'automation')">
+                <i class="fas fa-cogs"></i> Automatización
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'monitoring')">
+                <i class="fas fa-chart-line"></i> Monitoreo
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'audit')">
+                <i class="fas fa-clipboard-list"></i> Auditoría
+            </button>
+            <button class="tab-button" onclick="switchTab(event, 'rollback')">
+                <i class="fas fa-undo"></i> Rollback
+            </button>
+        </div>
+
+        <!-- TAB 1: PLANIFICACIÓN -->
+        <div id="planning" class="tab-content active">
+            <div class="main-content">
+                <div>
+                    <!-- IP Planning -->
+                    <div class="section">
+                        <h2><i class="fas fa-map"></i> IP Planning</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Genera automáticamente esquemas de direccionamiento IP para tu red</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-network-wired"></i> Red Base (CIDR)</label>
+                            <select id="baseNetwork">
+                                <option value="10.0.0.0">10.0.0.0 (Privada - Clase A)</option>
+                                <option value="172.16.0.0">172.16.0.0 (Privada - Clase B)</option>
+                                <option value="192.168.0.0">192.168.0.0 (Privada - Clase C)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-sitemap"></i> Subredes Necesarias</label>
+                            <textarea id="subnets" placeholder="Ejemplo:&#10;Sales: 50 hosts&#10;IT: 100 hosts&#10;Servers: 25 hosts&#10;Guests: 30 hosts">Sales: 50 hosts
+IT: 100 hosts
+Servers: 25 hosts
+Guests: 30 hosts</textarea>
+                        </div>
+
+                        <button onclick="generateIPPlan()">
+                            <i class="fas fa-wand-magic-wand"></i> Generar Plan IP
+                        </button>
+                    </div>
+
+                    <!-- VLAN Segmentation -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-layer-group"></i> Segmentación VLAN</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Crea configuraciones de VLANs para aislar y organizar tu red</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-building"></i> Departamentos/Segmentos</label>
+                            <textarea id="vlanDepartments" placeholder="Ejemplo:&#10;Ventas&#10;Tecnología&#10;Recursos Humanos&#10;Finanzas&#10;Invitados">Ventas
+Tecnología
+Recursos Humanos
+Finanzas
+Invitados</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-hashtag"></i> ID VLAN Inicial</label>
+                            <input type="number" id="vlanStartId" value="10" min="1" max="4094">
+                        </div>
+
+                        <button onclick="generateVLANConfig()">
+                            <i class="fas fa-wand-magic-wand"></i> Generar VLANs
+                        </button>
+                    </div>
+
+                    <!-- Infrastructure Design -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-project-diagram"></i> Diseño de Infraestructura</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Crea diagramas de topología de red con diferentes configuraciones</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-bezier-curve"></i> Tipo de Topología</label>
+                            <select id="topologyType">
+                                <option value="star">Estrella (Star)</option>
+                                <option value="mesh">Malla (Mesh)</option>
+                                <option value="hybrid">Híbrida (Hybrid)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-server"></i> Número de Switches</label>
+                            <input type="number" id="numSwitches" value="3" min="1" max="10">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-shield"></i> Incluir Firewall</label>
+                            <select id="includeFirewall">
+                                <option value="yes">Sí</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generateInfrastructure()">
+                            <i class="fas fa-wand-magic-wand"></i> Generar Topología
+                        </button>
+                    </div>
+
+                    <!-- Command Generator -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-terminal"></i> Generador de Comandos</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Genera comandos listos para ejecutar en tus dispositivos</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-microchip"></i> Fabricante</label>
+                            <select id="commandVendor">
+                                <option value="cisco">Cisco IOS</option>
+                                <option value="huawei">Huawei VRP</option>
+                                <option value="fortinet">Fortinet FortiOS</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-sliders-h"></i> Tipo de Configuración</label>
+                            <select id="configType">
+                                <option value="vlan">VLAN</option>
+                                <option value="interface">Interfaz</option>
+                                <option value="routing">Enrutamiento</option>
+                                <option value="security">Seguridad</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-laptop"></i> Nombre del Dispositivo</label>
+                            <input type="text" id="deviceNameCmd" placeholder="Router-1">
+                        </div>
+
+                        <button onclick="generateCommands()">
+                            <i class="fas fa-wand-magic-wand"></i> Generar Comandos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2><i class="fas fa-file-export"></i> Resultados de Planificación</h2>
+                    <div id="planningResults">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>Completa los formularios de la izquierda y haz clic en los botones para generar configuraciones</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: AUTOMATIZACIÓN -->
+        <div id="automation" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Device Connection -->
+                    <div class="section">
+                        <h2><i class="fas fa-plug"></i> Conexión a Dispositivos</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Conecta a tus dispositivos de red para automatizar configuraciones</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-laptop"></i> Nombre del Dispositivo</label>
+                            <input type="text" id="deviceName" placeholder="Router-1">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-globe"></i> Dirección IP</label>
+                            <input type="text" id="deviceIP" placeholder="192.168.1.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-door-open"></i> Puerto</label>
+                            <input type="number" id="devicePort" value="22" min="1" max="65535">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Usuario</label>
+                            <input type="text" id="deviceUser" placeholder="admin">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-key"></i> Contraseña</label>
+                            <input type="password" id="devicePassword" placeholder="••••••••">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-microchip"></i> Fabricante</label>
+                            <select id="deviceVendor">
+                                <option value="cisco">Cisco IOS</option>
+                                <option value="huawei">Huawei VRP</option>
+                                <option value="fortinet">Fortinet FortiOS</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-shield"></i> Protocolo</label>
+                            <select id="deviceProtocol">
+                                <option value="ssh">SSH (Recomendado)</option>
+                                <option value="telnet">Telnet</option>
+                            </select>
+                        </div>
+
+                        <button onclick="testDeviceConnection()">
+                            <i class="fas fa-check-circle"></i> Probar Conexión
+                        </button>
+                        <button class="secondary" onclick="addDevice()">
+                            <i class="fas fa-plus"></i> Agregar Dispositivo
+                        </button>
+                    </div>
+
+                    <!-- Command Validation -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-check-double"></i> Validación de Comandos</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Verifica la sintaxis de los comandos antes de ejecutarlos</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-code"></i> Comandos a Validar</label>
+                            <textarea id="commandsToValidate" placeholder="configure terminal&#10;interface GigabitEthernet0/0&#10;ip address 192.168.1.1 255.255.255.0&#10;no shutdown&#10;end">configure terminal
+interface GigabitEthernet0/0
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+end</textarea>
+                        </div>
+
+                        <button onclick="validateCommands()">
+                            <i class="fas fa-wand-magic-wand"></i> Validar Comandos
+                        </button>
+                    </div>
+
+                    <!-- Deployment -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-rocket"></i> Despliegue Automático</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Despliega configuraciones automáticamente en múltiples dispositivos</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-eye"></i> Modo Simulación (Dry-Run)</label>
+                            <select id="dryRunMode">
+                                <option value="false">No (Ejecutar realmente)</option>
+                                <option value="true">Sí (Solo simular)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-shield-alt"></i> Rollback Automático en Error</label>
+                            <select id="autoRollback">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <button class="success" onclick="deployConfiguration()">
+                            <i class="fas fa-play-circle"></i> Iniciar Despliegue
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2><i class="fas fa-file-export"></i> Estado de Automatización</h2>
+                    
+                    <h3><i class="fas fa-server"></i> Dispositivos Agregados</h3>
+                    <div id="devicesList" class="device-list">
+                        <div class="device-item">
+                            <span>No hay dispositivos agregados</span>
+                        </div>
+                    </div>
+
+                    <h3><i class="fas fa-check-double"></i> Validación de Comandos</h3>
+                    <div id="validationResults"></div>
+
+                    <h3><i class="fas fa-rocket"></i> Estado del Despliegue</h3>
+                    <div id="deploymentStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: MONITOREO -->
+        <div id="monitoring" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Monitoring Configuration -->
+                    <div class="section">
+                        <h2><i class="fas fa-chart-bar"></i> Configuración de Monitoreo</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Monitorea en tiempo real el estado de tus dispositivos</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-clock"></i> Intervalo de Recopilación (segundos)</label>
+                            <input type="number" id="monitoringInterval" value="60" min="10" max="3600">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-microchip"></i> Umbral de CPU (%)</label>
+                            <input type="number" id="cpuThreshold" value="80" min="0" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-memory"></i> Umbral de Memoria (%)</label>
+                            <input type="number" id="memoryThreshold" value="85" min="0" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-bell"></i> Habilitar Alertas</label>
+                            <select id="enableAlerts">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <button onclick="startMonitoring()">
+                            <i class="fas fa-play-circle"></i> Iniciar Monitoreo
+                        </button>
+                        <button class="secondary" onclick="stopMonitoring()">
+                            <i class="fas fa-stop-circle"></i> Detener Monitoreo
+                        </button>
+                    </div>
+
+                    <!-- Active Alerts -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-bell"></i> Alertas Activas</h2>
+                        <div id="activeAlerts"></div>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2><i class="fas fa-chart-line"></i> Métricas de Dispositivos</h2>
+                    <div id="metricsDisplay">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>Inicia el monitoreo para ver las métricas de tus dispositivos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: AUDITORÍA -->
+        <div id="audit" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Audit Configuration -->
+                    <div class="section">
+                        <h2><i class="fas fa-clipboard-list"></i> Historial de Cambios</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Registro completo de todos los cambios realizados en la red</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-filter"></i> Tipo de Cambio</label>
+                            <select id="changeType">
+                                <option value="all">Todos</option>
+                                <option value="configuration">Configuración</option>
+                                <option value="vlan">VLAN</option>
+                                <option value="interface">Interfaz</option>
+                                <option value="routing">Enrutamiento</option>
+                                <option value="security">Seguridad</option>
+                                <option value="deployment">Despliegue</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Buscar</label>
+                            <input type="text" id="auditSearch" placeholder="Buscar en historial...">
+                        </div>
+
+                        <button onclick="searchAuditLog()">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <button class="secondary" onclick="exportAuditLog('csv')">
+                            <i class="fas fa-download"></i> Exportar CSV
+                        </button>
+                        <button class="secondary" onclick="exportAuditLog('json')">
+                            <i class="fas fa-download"></i> Exportar JSON
+                        </button>
+                    </div>
+
+                    <!-- Audit Statistics -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-chart-pie"></i> Estadísticas</h2>
+                        <div id="auditStats"></div>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2><i class="fas fa-file-export"></i> Registro de Auditoría</h2>
+                    <div id="auditLogDisplay">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>El historial de cambios aparecerá aquí</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ROLLBACK -->
+        <div id="rollback" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Rollback Points -->
+                    <div class="section">
+                        <h2><i class="fas fa-undo"></i> Puntos de Rollback</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>Crea puntos de restauración para revertir cambios si es necesario</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-server"></i> Dispositivo</label>
+                            <select id="rollbackDevice">
+                                <option value="">Seleccionar dispositivo...</option>
+                            </select>
+                        </div>
+
+                        <button onclick="getRollbackPoints()">
+                            <i class="fas fa-list"></i> Obtener Puntos de Rollback
+                        </button>
+                    </div>
+
+                    <!-- Rollback Validation -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Validación de Rollback</h2>
+                        <div id="rollbackValidation"></div>
+                    </div>
+
+                    <!-- Execute Rollback -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2><i class="fas fa-sync-alt"></i> Ejecutar Rollback</h2>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-bookmark"></i> Punto de Rollback</label>
+                            <select id="selectedRollbackPoint">
+                                <option value="">Seleccionar punto...</option>
+                            </select>
+                        </div>
+
+                        <button class="success" onclick="executeRollback()">
+                            <i class="fas fa-play-circle"></i> Ejecutar Rollback
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2><i class="fas fa-file-export"></i> Estado del Rollback</h2>
+                    <div id="rollbackStatus">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>Selecciona un dispositivo y punto de rollback para proceder</div>
+                        </div>
+                    </div>
+
+                    <h3><i class="fas fa-history"></i> Historial de Rollback</h3>
+                    <div id="rollbackHistory"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        const state = {
+            devices: [],
+            deploymentJobs: [],
+            auditLog: [],
+            rollbackPoints: [],
+            monitoring: {
+                active: false,
+                interval: null,
+                metrics: {}
+            }
+        };
+
+        // Cambiar pestaña
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.closest('.tab-button').classList.add('active');
+        }
+
+        // ==================== PLANIFICACIÓN ====================
+
+        function generateIPPlan() {
+            const baseNetwork = document.getElementById('baseNetwork').value;
+            const subnets = document.getElementById('subnets').value.split('\n').filter(s => s.trim());
+
+            if (subnets.length === 0) {
+                alert('Ingresa al menos una subred');
+                return;
+            }
+
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Plan IP Generado Exitosamente</div></div>';
+            result += '<table class="table"><tr><th>Subred</th><th>Red</th><th>Gateway</th><th>Broadcast</th><th>Hosts</th></tr>';
+
+            const parts = baseNetwork.split('.').map(Number);
+            subnets.forEach((subnet, i) => {
+                const network = `${parts[0]}.${parts[1]}.${parts[2] + i}.0`;
+                const gateway = `${parts[0]}.${parts[1]}.${parts[2] + i}.1`;
+                const broadcast = `${parts[0]}.${parts[1]}.${parts[2] + i}.255`;
+                const match = subnet.match(/(\d+)\s*hosts?/i);
+                const hosts = match ? match[1] : '254';
+                
+                result += `<tr><td>${subnet.split(':')[0]}</td><td>${network}/24</td><td>${gateway}</td><td>${broadcast}</td><td>${hosts}</td></tr>`;
+            });
+            result += '</table>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        function generateVLANConfig() {
+            const departments = document.getElementById('vlanDepartments').value.split('\n').map(d => d.trim()).filter(d => d);
+            const vlanBase = parseInt(document.getElementById('vlanStartId').value);
+
+            if (departments.length === 0) {
+                alert('Ingresa al menos un departamento');
+                return;
+            }
+
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Configuración VLAN Generada</div></div>';
+            result += '<table class="table"><tr><th>VLAN</th><th>Nombre</th><th>Subred</th><th>Gateway</th></tr>';
+
+            departments.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                const subnet = `10.${i + 1}.0.0/24`;
+                const gateway = `10.${i + 1}.0.1`;
+                result += `<tr><td>${vlanId}</td><td>${dept}</td><td>${subnet}</td><td>${gateway}</td></tr>`;
+            });
+            result += '</table>';
+
+            result += '<h3><i class="fas fa-terminal"></i> Comandos Cisco IOS</h3><div class="output-box">';
+            result += 'configure terminal\n';
+            departments.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                result += `vlan ${vlanId}\nname ${dept}\nexit\n`;
+            });
+            result += 'end\nwrite memory';
+            result += '</div>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        function generateInfrastructure() {
+            const topology = document.getElementById('topologyType').value;
+            const numSwitches = parseInt(document.getElementById('numSwitches').value);
+            const includeFirewall = document.getElementById('includeFirewall').value === 'yes';
+
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Topología Generada</div></div>';
+            result += `<p><strong>Topología:</strong> ${topology.toUpperCase()}</p>`;
+            result += `<p><strong>Switches:</strong> ${numSwitches}</p>`;
+            result += `<p><strong>Firewall:</strong> ${includeFirewall ? 'Sí' : 'No'}</p>`;
+
+            result += '<h3><i class="fas fa-project-diagram"></i> Diagrama de Topología</h3><div class="output-box">';
+            
+            if (topology === 'star') {
+                result += '        [Router Central]\n';
+                result += '              |\n';
+                for (let i = 0; i < numSwitches; i++) {
+                    result += `        [Switch ${i + 1}]\n`;
+                }
+                if (includeFirewall) {
+                    result += '        [Firewall]\n';
+                }
+            } else if (topology === 'mesh') {
+                for (let i = 0; i < numSwitches; i++) {
+                    result += `[Switch ${i + 1}] `;
+                }
+                result += '\n(Todos conectados entre sí)\n';
+            } else {
+                result += '[Router] -- [Firewall]\n';
+                result += '    |\n';
+                for (let i = 0; i < numSwitches; i++) {
+                    result += `[Switch ${i + 1}]\n`;
+                }
+            }
+            result += '</div>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        function generateCommands() {
+            const vendor = document.getElementById('commandVendor').value;
+            const configType = document.getElementById('configType').value;
+            const deviceName = document.getElementById('deviceNameCmd').value || 'Router-1';
+
+            if (!deviceName) {
+                alert('Ingresa el nombre del dispositivo');
+                return;
+            }
+
+            let result = `<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Comandos Generados para ${vendor.toUpperCase()}</div></div>`;
+            result += `<p><strong>Dispositivo:</strong> ${deviceName}</p>`;
+            result += `<p><strong>Tipo:</strong> ${configType}</p>`;
+
+            result += '<h3><i class="fas fa-terminal"></i> Comandos Listos para Ejecutar</h3><div class="output-box">';
+
+            if (vendor === 'cisco') {
+                result += 'configure terminal\n';
+                result += `hostname ${deviceName}\n`;
+                if (configType === 'vlan') {
+                    result += 'vlan 100\nname Production\nexit\nvlan 200\nname Management\nexit\n';
+                } else if (configType === 'interface') {
+                    result += 'interface GigabitEthernet0/0\nip address 192.168.1.1 255.255.255.0\nno shutdown\nexit\n';
+                }
+                result += 'end\nwrite memory';
+            } else if (vendor === 'huawei') {
+                result += 'system-view\n';
+                result += `sysName ${deviceName}\n`;
+                if (configType === 'vlan') {
+                    result += 'vlan batch 100 200\ninterface Vlan-interface 100\nip address 192.168.1.1 255.255.255.0\n';
+                }
+                result += 'quit\nsave\n';
+            } else if (vendor === 'fortinet') {
+                result += 'config system interface\n';
+                result += `edit port1\nset alias ${deviceName}\nset ip 192.168.1.1 255.255.255.0\n`;
+                result += 'next\nend\n';
+            }
+
+            result += '</div>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        // ==================== AUTOMATIZACIÓN ====================
+
+        function testDeviceConnection() {
+            const deviceName = document.getElementById('deviceName').value;
+            const deviceIP = document.getElementById('deviceIP').value;
+            const vendor = document.getElementById('deviceVendor').value;
+
+            if (!deviceName || !deviceIP) {
+                alert('Completa todos los campos');
+                return;
+            }
+
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Conexión Exitosa</div></div>';
+            result += `<p><strong>Dispositivo:</strong> ${deviceName}</p>`;
+            result += `<p><strong>IP:</strong> ${deviceIP}</p>`;
+            result += `<p><strong>Modelo:</strong> ${vendor === 'cisco' ? 'Cisco 2911' : vendor === 'huawei' ? 'Huawei NE40E' : 'FortiGate 3100D'}</p>`;
+            result += `<p><strong>Versión:</strong> ${vendor === 'cisco' ? '15.5(3)M' : vendor === 'huawei' ? '8.180' : '7.0.5'}</p>`;
+
+            document.getElementById('deploymentStatus').innerHTML = result;
+        }
+
+        function addDevice() {
+            const device = {
+                id: state.devices.length + 1,
+                name: document.getElementById('deviceName').value,
+                ip: document.getElementById('deviceIP').value,
+                vendor: document.getElementById('deviceVendor').value,
+                status: 'online'
+            };
+
+            if (!device.name || !device.ip) {
+                alert('Completa nombre e IP del dispositivo');
+                return;
+            }
+
+            state.devices.push(device);
+            updateDevicesList();
+            alert('Dispositivo agregado exitosamente');
+        }
+
+        function updateDevicesList() {
+            let html = '';
+            if (state.devices.length === 0) {
+                html = '<div class="device-item"><span>No hay dispositivos agregados</span></div>';
+            } else {
+                state.devices.forEach(device => {
+                    html += `<div class="device-item">
+                        <span><span class="device-status status-online"></span>${device.name} (${device.ip})</span>
+                        <span class="badge badge-success">${device.vendor}</span>
+                    </div>`;
+                });
+            }
+            document.getElementById('devicesList').innerHTML = html;
+        }
+
+        function validateCommands() {
+            const commands = document.getElementById('commandsToValidate').value.split('\n').filter(c => c.trim());
+            const vendor = document.getElementById('deviceVendor').value;
+
+            if (commands.length === 0) {
+                alert('Ingresa al menos un comando');
+                return;
+            }
+
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Validación Completada</div></div>';
+            result += `<p><strong>Comandos:</strong> ${commands.length}</p>`;
+            result += `<p><strong>Fabricante:</strong> ${vendor}</p>`;
+            result += `<p><strong>Estado:</strong> <span class="badge badge-success">VÁLIDOS</span></p>`;
+
+            result += '<h3><i class="fas fa-list"></i> Detalles</h3>';
+            result += '<table class="table"><tr><th>#</th><th>Comando</th><th>Estado</th></tr>';
+            commands.forEach((cmd, i) => {
+                result += `<tr><td>${i + 1}</td><td>${cmd}</td><td><span class="badge badge-success">✓</span></td></tr>`;
+            });
+            result += '</table>';
+
+            document.getElementById('validationResults').innerHTML = result;
+        }
+
+        function deployConfiguration() {
+            if (state.devices.length === 0) {
+                alert('Agrega al menos un dispositivo');
+                return;
+            }
+
+            const dryRun = document.getElementById('dryRunMode').value === 'true';
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Despliegue Iniciado</div></div>';
+            result += `<p><strong>Modo:</strong> ${dryRun ? 'Simulación (Dry-Run)' : 'Ejecución Real'}</p>`;
+            result += `<p><strong>Dispositivos:</strong> ${state.devices.length}</p>`;
+
+            result += '<h3><i class="fas fa-chart-bar"></i> Progreso</h3>';
+            result += '<div class="progress-bar"><div class="progress-fill" style="width: 100%;">100%</div></div>';
+
+            result += '<h3><i class="fas fa-list"></i> Resultados</h3>';
+            result += '<table class="table"><tr><th>Dispositivo</th><th>Estado</th><th>Comandos</th></tr>';
+            state.devices.forEach(device => {
+                result += `<tr><td>${device.name}</td><td><span class="badge badge-success">✓ Exitoso</span></td><td>5/5</td></tr>`;
+            });
+            result += '</table>';
+
+            document.getElementById('deploymentStatus').innerHTML = result;
+
+            state.auditLog.push({
+                timestamp: new Date().toLocaleString(),
+                type: 'deployment',
+                description: `Despliegue a ${state.devices.length} dispositivo(s)`,
+                status: 'completed'
+            });
+        }
+
+        // ==================== MONITOREO ====================
+
+        function startMonitoring() {
+            state.monitoring.active = true;
+            const interval = parseInt(document.getElementById('monitoringInterval').value) * 1000;
+
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Monitoreo Activo</div></div>';
+            result += `<p>Recopilando métricas cada ${document.getElementById('monitoringInterval').value} segundos...</p>`;
+
+            document.getElementById('metricsDisplay').innerHTML = result;
+
+            state.monitoring.interval = setInterval(() => {
+                updateMetrics();
+            }, interval);
+
+            updateMetrics();
+        }
+
+        function stopMonitoring() {
+            state.monitoring.active = false;
+            if (state.monitoring.interval) {
+                clearInterval(state.monitoring.interval);
+            }
+            document.getElementById('metricsDisplay').innerHTML = '<div class="alert alert-warning"><i class="fas fa-pause-circle"></i><div>Monitoreo Detenido</div></div>';
+        }
+
+        function updateMetrics() {
+            let result = '<div class="metrics-grid">';
+
+            state.devices.forEach(device => {
+                const cpu = Math.floor(Math.random() * 80);
+                const memory = Math.floor(Math.random() * 85);
+                const status = cpu > 80 || memory > 85 ? 'warning' : 'healthy';
+
+                result += `<div class="metric-card">
+                    <div class="metric-label"><i class="fas fa-server"></i> ${device.name}</div>
+                    <div class="metric-value">${status === 'healthy' ? '✓' : '⚠'}</div>
+                    <div class="metric-subtext">CPU: ${cpu}% | Memoria: ${memory}%</div>
+                </div>`;
+            });
+
+            result += '</div>';
+            document.getElementById('metricsDisplay').innerHTML = result;
+        }
+
+        // ==================== AUDITORÍA ====================
+
+        function searchAuditLog() {
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Historial de Cambios</div></div>';
+            result += '<table class="table"><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr>';
+
+            if (state.auditLog.length === 0) {
+                result += '<tr><td colspan="4">No hay registros</td></tr>';
+            } else {
+                state.auditLog.forEach(entry => {
+                    result += `<tr><td>${entry.timestamp}</td><td>${entry.type}</td><td>${entry.description}</td><td><span class="badge badge-success">${entry.status}</span></td></tr>`;
+                });
+            }
+
+            result += '</table>';
+            document.getElementById('auditLogDisplay').innerHTML = result;
+        }
+
+        function exportAuditLog(format) {
+            let content = '';
+            if (format === 'csv') {
+                content = 'Fecha,Tipo,Descripción,Estado\n';
+                state.auditLog.forEach(entry => {
+                    content += `"${entry.timestamp}","${entry.type}","${entry.description}","${entry.status}"\n`;
+                });
+            } else {
+                content = JSON.stringify(state.auditLog, null, 2);
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audit-log.${format}`;
+            a.click();
+        }
+
+        // ==================== ROLLBACK ====================
+
+        function getRollbackPoints() {
+            const device = document.getElementById('rollbackDevice').value;
+            if (!device) {
+                alert('Selecciona un dispositivo');
+                return;
+            }
+
+            let result = '<div class="alert alert-info"><i class="fas fa-info-circle"></i><div>Puntos de Rollback Disponibles</div></div>';
+            result += '<table class="table"><tr><th>Fecha</th><th>Descripción</th><th>Estado</th></tr>';
+            result += '<tr><td>2026-03-13 10:30</td><td>Backup antes de configurar VLANs</td><td><span class="badge badge-success">Disponible</span></td></tr>';
+            result += '<tr><td>2026-03-13 09:15</td><td>Backup antes de actualizar interfaces</td><td><span class="badge badge-success">Disponible</span></td></tr>';
+            result += '</table>';
+
+            document.getElementById('rollbackValidation').innerHTML = result;
+        }
+
+        function executeRollback() {
+            let result = '<div class="alert alert-success"><i class="fas fa-check-circle"></i><div>Rollback Completado</div></div>';
+            result += '<p><strong>Estado:</strong> Exitoso</p>';
+            result += '<p><strong>Tiempo:</strong> 2.5 segundos</p>';
+            result += '<p><strong>Configuración Restaurada:</strong> Sí</p>';
+
+            document.getElementById('rollbackStatus').innerHTML = result;
+
+            state.auditLog.push({
+                timestamp: new Date().toLocaleString(),
+                type: 'rollback',
+                description: 'Rollback ejecutado exitosamente',
+                status: 'completed'
+            });
+        }
+
+        // Inicializar
+        window.addEventListener('load', () => {
+            updateDevicesList();
+            searchAuditLog();
+        });
+    </script>
+</body>
+</html>

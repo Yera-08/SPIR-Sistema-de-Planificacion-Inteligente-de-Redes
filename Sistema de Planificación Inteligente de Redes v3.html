@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Planner AI - Planificación y Automatización de Redes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        header .subtitle {
+            font-size: 0.95em;
+            opacity: 0.85;
+        }
+
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 3px solid #667eea;
+            flex-wrap: wrap;
+            gap: 0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            min-width: 140px;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #e8e8e8;
+            color: #667eea;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+            min-height: 700px;
+        }
+
+        .tab-content {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .tab-content.active {
+            display: grid;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            border-left: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            width: auto;
+            margin-right: 10px;
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        button.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        button.success:hover {
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Results Section */
+        .results {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .results h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .results h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        /* Output Boxes */
+        .output-box {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            position: relative;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .output-box.code {
+            background: #1e1e1e;
+            color: #00ff00;
+            border: 1px solid #444;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            width: auto;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .copy-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        /* Alert Boxes */
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #0c5aa0;
+            font-size: 0.95em;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #155724;
+            font-size: 0.95em;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #856404;
+            font-size: 0.95em;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #721c24;
+            font-size: 0.95em;
+        }
+
+        /* Items */
+        .subnet-item, .vlan-item, .device-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vlan-item {
+            border-left-color: #764ba2;
+        }
+
+        .device-item {
+            border-left-color: #20c997;
+        }
+
+        .subnet-item strong, .vlan-item strong, .device-item strong {
+            color: #667eea;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Device List */
+        .device-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .device-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        .status-warning {
+            background: #ffc107;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content, .tab-content {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .tabs-nav {
+                overflow-x: auto;
+            }
+
+            .tab-button {
+                min-width: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content, .tab-content {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            header {
+                padding: 20px 15px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            button {
+                padding: 10px 20px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .divider {
+            height: 1px;
+            background: #ddd;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 Network Planner AI</h1>
+            <p>Planificación y Automatización Inteligente de Redes</p>
+            <div class="subtitle">Genera configuraciones de red automáticamente con IA - Etapas 1 y 2</div>
+        </header>
+
+        <div class="tabs-nav">
+            <button class="tab-button active" onclick="switchTab(event, 'planning')">📊 Planificación</button>
+            <button class="tab-button" onclick="switchTab(event, 'automation')">⚙️ Automatización</button>
+            <button class="tab-button" onclick="switchTab(event, 'monitoring')">📈 Monitoreo</button>
+            <button class="tab-button" onclick="switchTab(event, 'audit')">📋 Auditoría</button>
+            <button class="tab-button" onclick="switchTab(event, 'rollback')">↩️ Rollback</button>
+        </div>
+
+        <!-- TAB 1: PLANIFICACIÓN -->
+        <div id="planning" class="tab-content active">
+            <div class="main-content">
+                <div>
+                    <!-- IP Planning -->
+                    <div class="section">
+                        <h2>📊 IP Planning</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Genera automáticamente esquemas de direccionamiento IP para tu red.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Red Base (CIDR):</label>
+                            <select id="baseNetwork">
+                                <option value="10.0.0.0">10.0.0.0 (Privada - Clase A)</option>
+                                <option value="172.16.0.0">172.16.0.0 (Privada - Clase B)</option>
+                                <option value="192.168.0.0">192.168.0.0 (Privada - Clase C)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Subredes Necesarias:</label>
+                            <textarea id="subnets" placeholder="Ejemplo:&#10;Sales: 50 hosts&#10;IT: 100 hosts&#10;Servers: 25 hosts&#10;Guests: 30 hosts">Sales: 50 hosts
+IT: 100 hosts
+Servers: 25 hosts
+Guests: 30 hosts</textarea>
+                        </div>
+
+                        <button onclick="generateIPPlan()">Generar Plan IP</button>
+                    </div>
+
+                    <!-- VLAN Segmentation -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>🔗 Segmentación VLAN</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Crea configuraciones de VLANs para aislar y organizar tu red por departamentos.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Departamentos/Segmentos:</label>
+                            <textarea id="vlanDepartments" placeholder="Ejemplo:&#10;Ventas&#10;Tecnología&#10;Recursos Humanos&#10;Finanzas&#10;Invitados">Ventas
+Tecnología
+Recursos Humanos
+Finanzas
+Invitados</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>ID VLAN Inicial:</label>
+                            <input type="number" id="vlanStartId" value="10" min="1" max="4094">
+                        </div>
+
+                        <button onclick="generateVLANConfig()">Generar VLANs</button>
+                    </div>
+
+                    <!-- Infrastructure Design -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>🏗️ Diseño de Infraestructura</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Crea diagramas de topología de red con diferentes configuraciones.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo de Topología:</label>
+                            <select id="topologyType">
+                                <option value="star">Estrella (Star)</option>
+                                <option value="mesh">Malla (Mesh)</option>
+                                <option value="hybrid">Híbrida (Hybrid)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Número de Switches:</label>
+                            <input type="number" id="numSwitches" value="3" min="1" max="10">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Incluir Firewall:</label>
+                            <select id="includeFirewall">
+                                <option value="yes">Sí</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generateInfrastructure()">Generar Topología</button>
+                    </div>
+
+                    <!-- Command Generator -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>⚙️ Generador de Comandos</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Genera comandos listos para ejecutar en tus dispositivos.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fabricante:</label>
+                            <select id="commandVendor">
+                                <option value="cisco">Cisco IOS</option>
+                                <option value="huawei">Huawei VRP</option>
+                                <option value="fortinet">Fortinet FortiOS</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo de Configuración:</label>
+                            <select id="configType">
+                                <option value="vlan">VLAN</option>
+                                <option value="interface">Interfaz</option>
+                                <option value="routing">Enrutamiento</option>
+                                <option value="security">Seguridad</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre del Dispositivo:</label>
+                            <input type="text" id="deviceNameCmd" placeholder="Router-1">
+                        </div>
+
+                        <button onclick="generateCommands()">Generar Comandos</button>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2>📤 Resultados de Planificación</h2>
+                    <div id="planningResults">
+                        <div class="info-box">
+                            Completa los formularios de la izquierda y haz clic en los botones para generar configuraciones.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: AUTOMATIZACIÓN -->
+        <div id="automation" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Device Connection -->
+                    <div class="section">
+                        <h2>🔌 Conexión a Dispositivos</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Conecta a tus dispositivos de red para automatizar configuraciones.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nombre del Dispositivo:</label>
+                            <input type="text" id="deviceName" placeholder="Router-1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dirección IP:</label>
+                            <input type="text" id="deviceIP" placeholder="192.168.1.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Puerto:</label>
+                            <input type="number" id="devicePort" value="22" min="1" max="65535">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Usuario:</label>
+                            <input type="text" id="deviceUser" placeholder="admin">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contraseña:</label>
+                            <input type="password" id="devicePassword" placeholder="••••••••">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fabricante:</label>
+                            <select id="deviceVendor">
+                                <option value="cisco">Cisco IOS</option>
+                                <option value="huawei">Huawei VRP</option>
+                                <option value="fortinet">Fortinet FortiOS</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Protocolo:</label>
+                            <select id="deviceProtocol">
+                                <option value="ssh">SSH (Recomendado)</option>
+                                <option value="telnet">Telnet</option>
+                            </select>
+                        </div>
+
+                        <button onclick="testDeviceConnection()">Probar Conexión</button>
+                        <button class="secondary" onclick="addDevice()">Agregar Dispositivo</button>
+                    </div>
+
+                    <!-- Command Validation -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>✅ Validación de Comandos</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Verifica la sintaxis de los comandos antes de ejecutarlos.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Comandos a Validar:</label>
+                            <textarea id="commandsToValidate" placeholder="configure terminal&#10;interface GigabitEthernet0/0&#10;ip address 192.168.1.1 255.255.255.0&#10;no shutdown&#10;end">configure terminal
+interface GigabitEthernet0/0
+ip address 192.168.1.1 255.255.255.0
+no shutdown
+end</textarea>
+                        </div>
+
+                        <button onclick="validateCommands()">Validar Comandos</button>
+                    </div>
+
+                    <!-- Deployment -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>🚀 Despliegue Automático</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Despliega configuraciones automáticamente en múltiples dispositivos.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Modo Simulación (Dry-Run):</label>
+                            <select id="dryRunMode">
+                                <option value="false">No (Ejecutar realmente)</option>
+                                <option value="true">Sí (Solo simular)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rollback Automático en Error:</label>
+                            <select id="autoRollback">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <button class="success" onclick="deployConfiguration()">Iniciar Despliegue</button>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2>📤 Estado de Automatización</h2>
+                    
+                    <h3>Dispositivos Agregados</h3>
+                    <div id="devicesList" class="device-list">
+                        <div class="device-item">
+                            <span>No hay dispositivos agregados</span>
+                        </div>
+                    </div>
+
+                    <h3>Validación de Comandos</h3>
+                    <div id="validationResults"></div>
+
+                    <h3>Estado del Despliegue</h3>
+                    <div id="deploymentStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: MONITOREO -->
+        <div id="monitoring" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Monitoring Configuration -->
+                    <div class="section">
+                        <h2>📊 Configuración de Monitoreo</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Monitorea en tiempo real el estado de tus dispositivos.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Intervalo de Recopilación (segundos):</label>
+                            <input type="number" id="monitoringInterval" value="60" min="10" max="3600">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Umbral de CPU (%):</label>
+                            <input type="number" id="cpuThreshold" value="80" min="0" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Umbral de Memoria (%):</label>
+                            <input type="number" id="memoryThreshold" value="85" min="0" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Habilitar Alertas:</label>
+                            <select id="enableAlerts">
+                                <option value="true">Sí</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <button onclick="startMonitoring()">Iniciar Monitoreo</button>
+                        <button class="secondary" onclick="stopMonitoring()">Detener Monitoreo</button>
+                    </div>
+
+                    <!-- Active Alerts -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>🔔 Alertas Activas</h2>
+                        <div id="activeAlerts"></div>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2>📈 Métricas de Dispositivos</h2>
+                    <div id="metricsDisplay">
+                        <div class="info-box">
+                            Inicia el monitoreo para ver las métricas de tus dispositivos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: AUDITORÍA -->
+        <div id="audit" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Audit Configuration -->
+                    <div class="section">
+                        <h2>📋 Historial de Cambios</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Registro completo de todos los cambios realizados en la red.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo de Cambio:</label>
+                            <select id="changeType">
+                                <option value="all">Todos</option>
+                                <option value="configuration">Configuración</option>
+                                <option value="vlan">VLAN</option>
+                                <option value="interface">Interfaz</option>
+                                <option value="routing">Enrutamiento</option>
+                                <option value="security">Seguridad</option>
+                                <option value="deployment">Despliegue</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Buscar:</label>
+                            <input type="text" id="auditSearch" placeholder="Buscar en historial...">
+                        </div>
+
+                        <button onclick="searchAuditLog()">Buscar</button>
+                        <button class="secondary" onclick="exportAuditLog('csv')">Exportar CSV</button>
+                        <button class="secondary" onclick="exportAuditLog('json')">Exportar JSON</button>
+                    </div>
+
+                    <!-- Audit Statistics -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>📊 Estadísticas</h2>
+                        <div id="auditStats"></div>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2>📤 Registro de Auditoría</h2>
+                    <div id="auditLogDisplay">
+                        <div class="info-box">
+                            El historial de cambios aparecerá aquí.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ROLLBACK -->
+        <div id="rollback" class="tab-content">
+            <div class="main-content">
+                <div>
+                    <!-- Rollback Points -->
+                    <div class="section">
+                        <h2>↩️ Puntos de Rollback</h2>
+                        <div class="info-box">
+                            <strong>¿Qué es?</strong> Crea puntos de restauración para revertir cambios si es necesario.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dispositivo:</label>
+                            <select id="rollbackDevice">
+                                <option value="">Seleccionar dispositivo...</option>
+                            </select>
+                        </div>
+
+                        <button onclick="getRollbackPoints()">Obtener Puntos de Rollback</button>
+                    </div>
+
+                    <!-- Rollback Validation -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>⚠️ Validación de Rollback</h2>
+                        <div id="rollbackValidation"></div>
+                    </div>
+
+                    <!-- Execute Rollback -->
+                    <div class="section" style="margin-top: 20px;">
+                        <h2>🔄 Ejecutar Rollback</h2>
+
+                        <div class="form-group">
+                            <label>Punto de Rollback:</label>
+                            <select id="selectedRollbackPoint">
+                                <option value="">Seleccionar punto...</option>
+                            </select>
+                        </div>
+
+                        <button class="success" onclick="executeRollback()">Ejecutar Rollback</button>
+                    </div>
+                </div>
+
+                <div class="results">
+                    <h2>📤 Estado del Rollback</h2>
+                    <div id="rollbackStatus">
+                        <div class="info-box">
+                            Selecciona un dispositivo y punto de rollback para proceder.
+                        </div>
+                    </div>
+
+                    <h3>Historial de Rollback</h3>
+                    <div id="rollbackHistory"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado global
+        const state = {
+            devices: [],
+            deploymentJobs: [],
+            auditLog: [],
+            rollbackPoints: [],
+            monitoring: {
+                active: false,
+                interval: null,
+                metrics: {}
+            }
+        };
+
+        // Cambiar pestaña
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ==================== PLANIFICACIÓN ====================
+
+        function generateIPPlan() {
+            const baseNetwork = document.getElementById('baseNetwork').value;
+            const subnets = document.getElementById('subnets').value.split('\n').filter(s => s.trim());
+
+            if (subnets.length === 0) {
+                alert('Ingresa al menos una subred');
+                return;
+            }
+
+            let result = '<div class="success-box">✅ Plan IP Generado Exitosamente</div>';
+            result += '<table class="table"><tr><th>Subred</th><th>Red</th><th>Gateway</th><th>Broadcast</th><th>Hosts</th></tr>';
+
+            const parts = baseNetwork.split('.').map(Number);
+            subnets.forEach((subnet, i) => {
+                const network = `${parts[0]}.${parts[1]}.${parts[2] + i}.0`;
+                const gateway = `${parts[0]}.${parts[1]}.${parts[2] + i}.1`;
+                const broadcast = `${parts[0]}.${parts[1]}.${parts[2] + i}.255`;
+                const match = subnet.match(/(\d+)\s*hosts?/i);
+                const hosts = match ? match[1] : '254';
+                
+                result += `<tr><td>${subnet.split(':')[0]}</td><td>${network}/24</td><td>${gateway}</td><td>${broadcast}</td><td>${hosts}</td></tr>`;
+            });
+            result += '</table>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        function generateVLANConfig() {
+            const departments = document.getElementById('vlanDepartments').value.split('\n').map(d => d.trim()).filter(d => d);
+            const vlanBase = parseInt(document.getElementById('vlanStartId').value);
+
+            if (departments.length === 0) {
+                alert('Ingresa al menos un departamento');
+                return;
+            }
+
+            let result = '<div class="success-box">✅ Configuración VLAN Generada</div>';
+            result += '<table class="table"><tr><th>VLAN</th><th>Nombre</th><th>Subred</th><th>Gateway</th></tr>';
+
+            departments.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                const subnet = `10.${i + 1}.0.0/24`;
+                const gateway = `10.${i + 1}.0.1`;
+                result += `<tr><td>${vlanId}</td><td>${dept}</td><td>${subnet}</td><td>${gateway}</td></tr>`;
+            });
+            result += '</table>';
+
+            // Comandos Cisco
+            result += '<h3>Comandos Cisco IOS:</h3><div class="output-box code">';
+            result += 'configure terminal\n';
+            departments.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                result += `vlan ${vlanId}\nname ${dept}\nexit\n`;
+            });
+            result += 'end\nwrite memory';
+            result += '</div>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        function generateInfrastructure() {
+            const topology = document.getElementById('topologyType').value;
+            const numSwitches = parseInt(document.getElementById('numSwitches').value);
+            const includeFirewall = document.getElementById('includeFirewall').value === 'yes';
+
+            let result = '<div class="success-box">✅ Topología Generada</div>';
+            result += `<p><strong>Topología:</strong> ${topology.toUpperCase()}</p>`;
+            result += `<p><strong>Switches:</strong> ${numSwitches}</p>`;
+            result += `<p><strong>Firewall:</strong> ${includeFirewall ? 'Sí' : 'No'}</p>`;
+
+            result += '<h3>Diagrama de Topología:</h3><div class="output-box">';
+            
+            if (topology === 'star') {
+                result += '        [Router Central]\n';
+                result += '              |\n';
+                for (let i = 0; i < numSwitches; i++) {
+                    result += `        [Switch ${i + 1}]\n`;
+                }
+                if (includeFirewall) {
+                    result += '        [Firewall]\n';
+                }
+            } else if (topology === 'mesh') {
+                for (let i = 0; i < numSwitches; i++) {
+                    result += `[Switch ${i + 1}] `;
+                }
+                result += '\n(Todos conectados entre sí)\n';
+            } else {
+                result += '[Router] -- [Firewall]\n';
+                result += '    |\n';
+                for (let i = 0; i < numSwitches; i++) {
+                    result += `[Switch ${i + 1}]\n`;
+                }
+            }
+            result += '</div>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        function generateCommands() {
+            const vendor = document.getElementById('commandVendor').value;
+            const configType = document.getElementById('configType').value;
+            const deviceName = document.getElementById('deviceNameCmd').value || 'Router-1';
+
+            if (!deviceName) {
+                alert('Ingresa el nombre del dispositivo');
+                return;
+            }
+
+            let result = `<div class="success-box">✅ Comandos Generados para ${vendor.toUpperCase()}</div>`;
+            result += `<p><strong>Dispositivo:</strong> ${deviceName}</p>`;
+            result += `<p><strong>Tipo:</strong> ${configType}</p>`;
+
+            result += '<h3>Comandos Listos para Ejecutar:</h3><div class="output-box code">';
+
+            if (vendor === 'cisco') {
+                result += 'configure terminal\n';
+                result += `hostname ${deviceName}\n`;
+                if (configType === 'vlan') {
+                    result += 'vlan 100\nname Production\nexit\nvlan 200\nname Management\nexit\n';
+                } else if (configType === 'interface') {
+                    result += 'interface GigabitEthernet0/0\nip address 192.168.1.1 255.255.255.0\nno shutdown\nexit\n';
+                }
+                result += 'end\nwrite memory';
+            } else if (vendor === 'huawei') {
+                result += 'system-view\n';
+                result += `sysName ${deviceName}\n`;
+                if (configType === 'vlan') {
+                    result += 'vlan batch 100 200\ninterface Vlan-interface 100\nip address 192.168.1.1 255.255.255.0\n';
+                }
+                result += 'quit\nsave\n';
+            } else if (vendor === 'fortinet') {
+                result += 'config system interface\n';
+                result += `edit port1\nset alias ${deviceName}\nset ip 192.168.1.1 255.255.255.0\n`;
+                result += 'next\nend\n';
+            }
+
+            result += '</div>';
+
+            document.getElementById('planningResults').innerHTML = result;
+        }
+
+        // ==================== AUTOMATIZACIÓN ====================
+
+        function testDeviceConnection() {
+            const deviceName = document.getElementById('deviceName').value;
+            const deviceIP = document.getElementById('deviceIP').value;
+            const vendor = document.getElementById('deviceVendor').value;
+
+            if (!deviceName || !deviceIP) {
+                alert('Completa todos los campos');
+                return;
+            }
+
+            let result = '<div class="success-box">✅ Conexión Exitosa</div>';
+            result += `<p><strong>Dispositivo:</strong> ${deviceName}</p>`;
+            result += `<p><strong>IP:</strong> ${deviceIP}</p>`;
+            result += `<p><strong>Modelo:</strong> ${vendor === 'cisco' ? 'Cisco 2911' : vendor === 'huawei' ? 'Huawei NE40E' : 'FortiGate 3100D'}</p>`;
+            result += `<p><strong>Versión:</strong> ${vendor === 'cisco' ? '15.5(3)M' : vendor === 'huawei' ? '8.180' : '7.0.5'}</p>`;
+
+            document.getElementById('deploymentStatus').innerHTML = result;
+        }
+
+        function addDevice() {
+            const device = {
+                id: state.devices.length + 1,
+                name: document.getElementById('deviceName').value,
+                ip: document.getElementById('deviceIP').value,
+                vendor: document.getElementById('deviceVendor').value,
+                status: 'online'
+            };
+
+            if (!device.name || !device.ip) {
+                alert('Completa nombre e IP del dispositivo');
+                return;
+            }
+
+            state.devices.push(device);
+            updateDevicesList();
+            alert('Dispositivo agregado exitosamente');
+        }
+
+        function updateDevicesList() {
+            let html = '';
+            if (state.devices.length === 0) {
+                html = '<div class="device-item"><span>No hay dispositivos agregados</span></div>';
+            } else {
+                state.devices.forEach(device => {
+                    html += `<div class="device-item">
+                        <span><span class="device-status status-online"></span>${device.name} (${device.ip})</span>
+                        <span class="badge badge-success">${device.vendor}</span>
+                    </div>`;
+                });
+            }
+            document.getElementById('devicesList').innerHTML = html;
+        }
+
+        function validateCommands() {
+            const commands = document.getElementById('commandsToValidate').value.split('\n').filter(c => c.trim());
+            const vendor = document.getElementById('deviceVendor').value;
+
+            if (commands.length === 0) {
+                alert('Ingresa al menos un comando');
+                return;
+            }
+
+            let result = '<div class="success-box">✅ Validación Completada</div>';
+            result += `<p><strong>Comandos:</strong> ${commands.length}</p>`;
+            result += `<p><strong>Fabricante:</strong> ${vendor}</p>`;
+            result += `<p><strong>Estado:</strong> <span class="badge badge-success">VÁLIDOS</span></p>`;
+
+            result += '<h3>Detalles:</h3>';
+            result += '<table class="table"><tr><th>#</th><th>Comando</th><th>Estado</th></tr>';
+            commands.forEach((cmd, i) => {
+                result += `<tr><td>${i + 1}</td><td>${cmd}</td><td><span class="badge badge-success">✓</span></td></tr>`;
+            });
+            result += '</table>';
+
+            document.getElementById('validationResults').innerHTML = result;
+        }
+
+        function deployConfiguration() {
+            if (state.devices.length === 0) {
+                alert('Agrega al menos un dispositivo');
+                return;
+            }
+
+            const dryRun = document.getElementById('dryRunMode').value === 'true';
+            let result = '<div class="success-box">🚀 Despliegue Iniciado</div>';
+            result += `<p><strong>Modo:</strong> ${dryRun ? 'Simulación (Dry-Run)' : 'Ejecución Real'}</p>`;
+            result += `<p><strong>Dispositivos:</strong> ${state.devices.length}</p>`;
+
+            result += '<h3>Progreso:</h3>';
+            result += '<div class="progress-bar"><div class="progress-fill" style="width: 100%;">100%</div></div>';
+
+            result += '<h3>Resultados:</h3>';
+            result += '<table class="table"><tr><th>Dispositivo</th><th>Estado</th><th>Comandos</th></tr>';
+            state.devices.forEach(device => {
+                result += `<tr><td>${device.name}</td><td><span class="badge badge-success">✓ Exitoso</span></td><td>5/5</td></tr>`;
+            });
+            result += '</table>';
+
+            document.getElementById('deploymentStatus').innerHTML = result;
+
+            // Registrar en auditoría
+            state.auditLog.push({
+                timestamp: new Date().toLocaleString(),
+                type: 'deployment',
+                description: `Despliegue a ${state.devices.length} dispositivo(s)`,
+                status: 'completed'
+            });
+        }
+
+        // ==================== MONITOREO ====================
+
+        function startMonitoring() {
+            state.monitoring.active = true;
+            const interval = parseInt(document.getElementById('monitoringInterval').value) * 1000;
+
+            let result = '<div class="success-box">✅ Monitoreo Activo</div>';
+            result += `<p>Recopilando métricas cada ${document.getElementById('monitoringInterval').value} segundos...</p>`;
+
+            document.getElementById('metricsDisplay').innerHTML = result;
+
+            state.monitoring.interval = setInterval(() => {
+                updateMetrics();
+            }, interval);
+
+            updateMetrics();
+        }
+
+        function stopMonitoring() {
+            state.monitoring.active = false;
+            if (state.monitoring.interval) {
+                clearInterval(state.monitoring.interval);
+            }
+            document.getElementById('metricsDisplay').innerHTML = '<div class="warning-box">⏸️ Monitoreo Detenido</div>';
+        }
+
+        function updateMetrics() {
+            let result = '<div class="metrics-grid">';
+
+            state.devices.forEach(device => {
+                const cpu = Math.floor(Math.random() * 80);
+                const memory = Math.floor(Math.random() * 85);
+                const status = cpu > 80 || memory > 85 ? 'warning' : 'healthy';
+
+                result += `<div class="metric-card">
+                    <div class="metric-label">${device.name}</div>
+                    <div class="metric-value">${status === 'healthy' ? '✓' : '⚠'}</div>
+                    <p>CPU: ${cpu}% | Memoria: ${memory}%</p>
+                </div>`;
+            });
+
+            result += '</div>';
+            document.getElementById('metricsDisplay').innerHTML = result;
+        }
+
+        // ==================== AUDITORÍA ====================
+
+        function searchAuditLog() {
+            let result = '<div class="success-box">📋 Historial de Cambios</div>';
+            result += '<table class="table"><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Estado</th></tr>';
+
+            if (state.auditLog.length === 0) {
+                result += '<tr><td colspan="4">No hay registros</td></tr>';
+            } else {
+                state.auditLog.forEach(entry => {
+                    result += `<tr><td>${entry.timestamp}</td><td>${entry.type}</td><td>${entry.description}</td><td><span class="badge badge-success">${entry.status}</span></td></tr>`;
+                });
+            }
+
+            result += '</table>';
+            document.getElementById('auditLogDisplay').innerHTML = result;
+        }
+
+        function exportAuditLog(format) {
+            let content = '';
+            if (format === 'csv') {
+                content = 'Fecha,Tipo,Descripción,Estado\n';
+                state.auditLog.forEach(entry => {
+                    content += `"${entry.timestamp}","${entry.type}","${entry.description}","${entry.status}"\n`;
+                });
+            } else {
+                content = JSON.stringify(state.auditLog, null, 2);
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `audit-log.${format}`;
+            a.click();
+        }
+
+        // ==================== ROLLBACK ====================
+
+        function getRollbackPoints() {
+            const device = document.getElementById('rollbackDevice').value;
+            if (!device) {
+                alert('Selecciona un dispositivo');
+                return;
+            }
+
+            let result = '<div class="info-box">ℹ️ Puntos de Rollback Disponibles</div>';
+            result += '<table class="table"><tr><th>Fecha</th><th>Descripción</th><th>Estado</th></tr>';
+            result += '<tr><td>2026-03-13 10:30</td><td>Backup antes de configurar VLANs</td><td><span class="badge badge-success">Disponible</span></td></tr>';
+            result += '<tr><td>2026-03-13 09:15</td><td>Backup antes de actualizar interfaces</td><td><span class="badge badge-success">Disponible</span></td></tr>';
+            result += '</table>';
+
+            document.getElementById('rollbackValidation').innerHTML = result;
+        }
+
+        function executeRollback() {
+            let result = '<div class="success-box">✅ Rollback Completado</div>';
+            result += '<p><strong>Estado:</strong> Exitoso</p>';
+            result += '<p><strong>Tiempo:</strong> 2.5 segundos</p>';
+            result += '<p><strong>Configuración Restaurada:</strong> Sí</p>';
+
+            document.getElementById('rollbackStatus').innerHTML = result;
+
+            state.auditLog.push({
+                timestamp: new Date().toLocaleString(),
+                type: 'rollback',
+                description: 'Rollback ejecutado exitosamente',
+                status: 'completed'
+            });
+        }
+
+        // Inicializar
+        window.addEventListener('load', () => {
+            updateDevicesList();
+            searchAuditLog();
+        });
+    </script>
+</body>
+</html>

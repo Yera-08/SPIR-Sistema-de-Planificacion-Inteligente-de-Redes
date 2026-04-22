@@ -1,0 +1,7 @@
+IP,Marca,Usuario,Tipo,Estado
+192.168.1.1,Cisco,admin,cisco_ios,Activo
+192.168.1.2,Huawei,admin,huawei,Activo
+192.168.1.3,Fortinet,admin,fortinet,Activo
+192.168.1.4,MikroTik,admin,mikrotik,Activo
+192.168.1.5,Cisco,admin,cisco_ios,Inactivo
+192.168.1.6,Huawei,admin,huawei,Activo

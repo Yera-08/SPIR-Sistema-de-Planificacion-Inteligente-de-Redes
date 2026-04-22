@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Planner AI - Planificador de Redes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Results Section */
+        .results {
+            grid-column: 1 / -1;
+            background: white;
+            border: 2px solid #667eea;
+        }
+
+        .results h2 {
+            color: #667eea;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            width: auto;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Output Boxes */
+        .output-box {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .output-box.code {
+            background: #1e1e1e;
+            color: #00ff00;
+            border: 1px solid #444;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            width: auto;
+        }
+
+        .copy-button:hover {
+            background: #764ba2;
+        }
+
+        .subnet-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .subnet-item strong {
+            color: #667eea;
+        }
+
+        .vlan-item {
+            background: white;
+            border-left: 4px solid #764ba2;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .vlan-item strong {
+            color: #764ba2;
+        }
+
+        .command-item {
+            background: #1e1e1e;
+            color: #00ff00;
+            border-left: 4px solid #00ff00;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .diagram {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #0c5aa0;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #155724;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #856404;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .results {
+                grid-column: 1;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 Network Planner AI</h1>
+            <p>Herramienta de Planificación de Redes con Inteligencia Artificial</p>
+        </header>
+
+        <div class="main-content">
+            <!-- IP Planning Section -->
+            <div class="section">
+                <h2>📊 IP Planning</h2>
+                <div class="info-box">
+                    <strong>¿Qué es?</strong> Genera automáticamente esquemas de direccionamiento IP para tu red.
+                </div>
+
+                <div class="form-group">
+                    <label for="baseNetwork">Red Base (CIDR):</label>
+                    <select id="baseNetwork">
+                        <option value="10.0.0.0">10.0.0.0 (Privada - Clase A)</option>
+                        <option value="172.16.0.0">172.16.0.0 (Privada - Clase B)</option>
+                        <option value="192.168.0.0">192.168.0.0 (Privada - Clase C)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="subnets">Subredes Necesarias:</label>
+                    <textarea id="subnets" placeholder="Ejemplo:&#10;Sales: 50 hosts&#10;IT: 100 hosts&#10;Servers: 25 hosts&#10;Guests: 30 hosts"></textarea>
+                </div>
+
+                <button onclick="generateIPPlan()">Generar Plan IP</button>
+            </div>
+
+            <!-- VLAN Segmentation Section -->
+            <div class="section">
+                <h2>🔗 Segmentación VLAN</h2>
+                <div class="info-box">
+                    <strong>¿Qué es?</strong> Crea configuraciones de VLANs para aislar y organizar tu red por departamentos.
+                </div>
+
+                <div class="form-group">
+                    <label for="vlanDepartments">Departamentos/Segmentos:</label>
+                    <textarea id="vlanDepartments" placeholder="Ejemplo:&#10;Ventas&#10;Tecnología&#10;Recursos Humanos&#10;Finanzas&#10;Invitados"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="vlanStartId">ID VLAN Inicial:</label>
+                    <input type="number" id="vlanStartId" value="10" min="1" max="4094">
+                </div>
+
+                <button onclick="generateVLANConfig()">Generar VLANs</button>
+            </div>
+
+            <!-- Infrastructure Design Section -->
+            <div class="section">
+                <h2>🏗️ Diseño de Infraestructura</h2>
+                <div class="info-box">
+                    <strong>¿Qué es?</strong> Diseña la topología física de tu red (cómo se conectan los dispositivos).
+                </div>
+
+                <div class="form-group">
+                    <label for="topology">Tipo de Topología:</label>
+                    <select id="topology">
+                        <option value="star">Estrella (Star) - Un punto central</option>
+                        <option value="mesh">Malla (Mesh) - Todos conectados entre sí</option>
+                        <option value="hybrid">Híbrida - Combinación de ambas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="deviceCount">Número de Dispositivos:</label>
+                    <input type="number" id="deviceCount" value="5" min="2" max="20">
+                </div>
+
+                <div class="form-group">
+                    <label>Dispositivos a Incluir:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="devices" value="router" checked> Router Principal</label>
+                        <label><input type="checkbox" name="devices" value="switch" checked> Switches</label>
+                        <label><input type="checkbox" name="devices" value="firewall" checked> Firewall</label>
+                        <label><input type="checkbox" name="devices" value="ap" checked> Access Points (WiFi)</label>
+                    </div>
+                </div>
+
+                <button onclick="generateInfrastructure()">Generar Diseño</button>
+            </div>
+
+            <!-- Command Generator Section -->
+            <div class="section">
+                <h2>⚙️ Generador de Comandos</h2>
+                <div class="info-box">
+                    <strong>¿Qué es?</strong> Genera comandos de configuración listos para aplicar en tus dispositivos.
+                </div>
+
+                <div class="form-group">
+                    <label>Fabricantes:</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="vendors" value="cisco" checked> Cisco IOS</label>
+                        <label><input type="checkbox" name="vendors" value="huawei" checked> Huawei VRP</label>
+                        <label><input type="checkbox" name="vendors" value="fortinet" checked> Fortinet FortiOS</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="hostname">Nombre del Dispositivo:</label>
+                    <input type="text" id="hostname" placeholder="Ejemplo: Router-Principal">
+                </div>
+
+                <div class="form-group">
+                    <label for="deviceType">Tipo de Dispositivo:</label>
+                    <select id="deviceType">
+                        <option value="router">Router</option>
+                        <option value="switch">Switch</option>
+                        <option value="firewall">Firewall</option>
+                    </select>
+                </div>
+
+                <button onclick="generateCommands()">Generar Comandos</button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="section results">
+                <h2>📋 Resultados</h2>
+
+                <div class="tabs">
+                    <button class="tab-button active" onclick="switchTab('ip-plan')">Plan IP</button>
+                    <button class="tab-button" onclick="switchTab('vlans')">VLANs</button>
+                    <button class="tab-button" onclick="switchTab('infrastructure')">Infraestructura</button>
+                    <button class="tab-button" onclick="switchTab('commands')">Comandos</button>
+                </div>
+
+                <!-- IP Plan Tab -->
+                <div id="ip-plan" class="tab-content active">
+                    <div id="ipPlanResults"></div>
+                </div>
+
+                <!-- VLANs Tab -->
+                <div id="vlans" class="tab-content">
+                    <div id="vlanResults"></div>
+                </div>
+
+                <!-- Infrastructure Tab -->
+                <div id="infrastructure" class="tab-content">
+                    <div id="infrastructureResults"></div>
+                </div>
+
+                <!-- Commands Tab -->
+                <div id="commands" class="tab-content">
+                    <div id="commandResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Utility Functions
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('¡Copiado al portapapeles!');
+            });
+        }
+
+        // IP Planning Functions
+        function generateIPPlan() {
+            const baseNetwork = document.getElementById('baseNetwork').value;
+            const subnetsText = document.getElementById('subnets').value;
+
+            if (!subnetsText.trim()) {
+                alert('Por favor, ingresa las subredes necesarias');
+                return;
+            }
+
+            // Parse subnets
+            const lines = subnetsText.split('\n').filter(line => line.trim());
+            const subnets = [];
+            let totalHosts = 0;
+
+            lines.forEach(line => {
+                const match = line.match(/(.+?):\s*(\d+)/);
+                if (match) {
+                    const name = match[1].trim();
+                    const hosts = parseInt(match[2]);
+                    subnets.push({ name, hosts });
+                    totalHosts += hosts;
+                }
+            });
+
+            if (subnets.length === 0) {
+                alert('No se encontraron subredes válidas. Usa el formato: "Nombre: cantidad"');
+                return;
+            }
+
+            // Generate IP plan
+            const baseIp = baseNetwork.split('.').slice(0, 3).join('.');
+            let currentIp = parseInt(baseNetwork.split('.')[3]);
+            let html = '<div class="success-box">✓ Plan IP generado exitosamente</div>';
+
+            html += `<div class="info-box"><strong>Red Base:</strong> ${baseNetwork}/16 | <strong>Total de Hosts:</strong> ${totalHosts}</div>`;
+
+            subnets.forEach((subnet, index) => {
+                const maskBits = calculateMaskBits(subnet.hosts);
+                const mask = 32 - maskBits;
+                const network = `${baseIp}.${currentIp}`;
+                const gateway = `${baseIp}.${currentIp + 1}`;
+                const broadcast = `${baseIp}.${currentIp + (Math.pow(2, maskBits) - 1)}`;
+                const usableIps = Math.pow(2, maskBits) - 2;
+
+                html += `
+                    <div class="subnet-item">
+                        <strong>Subred ${index + 1}: ${subnet.name}</strong><br>
+                        Red: ${network}/${mask}<br>
+                        Gateway: ${gateway}<br>
+                        Broadcast: ${broadcast}<br>
+                        IPs Usables: ${usableIps} (para ${subnet.hosts} hosts)
+                    </div>
+                `;
+
+                currentIp += Math.pow(2, maskBits);
+            });
+
+            document.getElementById('ipPlanResults').innerHTML = html;
+            switchTab('ip-plan');
+        }
+
+        function calculateMaskBits(hosts) {
+            let bits = 0;
+            while (Math.pow(2, bits) < hosts + 2) {
+                bits++;
+            }
+            return bits;
+        }
+
+        // VLAN Functions
+        function generateVLANConfig() {
+            const departmentsText = document.getElementById('vlanDepartments').value;
+            const vlanStartId = parseInt(document.getElementById('vlanStartId').value);
+
+            if (!departmentsText.trim()) {
+                alert('Por favor, ingresa los departamentos/segmentos');
+                return;
+            }
+
+            const departments = departmentsText.split('\n').filter(d => d.trim());
+            let html = '<div class="success-box">✓ Configuración VLAN generada exitosamente</div>';
+
+            departments.forEach((dept, index) => {
+                const vlanId = vlanStartId + (index * 10);
+                const ipSubnet = `10.${vlanStartId + index}.0.0/24`;
+                const gateway = `10.${vlanStartId + index}.0.1`;
+
+                html += `
+                    <div class="vlan-item">
+                        <strong>VLAN ${vlanId}: ${dept}</strong><br>
+                        Subnet IP: ${ipSubnet}<br>
+                        Gateway: ${gateway}<br>
+                        Descripción: Red para ${dept}
+                    </div>
+                `;
+            });
+
+            html += `<div class="info-box" style="margin-top: 20px;">
+                <strong>Configuración de Puertos Troncales:</strong><br>
+                Interfaces: GigabitEthernet0/1, GigabitEthernet0/2<br>
+                VLANs Permitidas: ${Array.from({length: departments.length}, (_, i) => vlanStartId + (i * 10)).join(', ')}
+            </div>`;
+
+            document.getElementById('vlanResults').innerHTML = html;
+            switchTab('vlans');
+        }
+
+        // Infrastructure Design Functions
+        function generateInfrastructure() {
+            const topology = document.getElementById('topology').value;
+            const deviceCount = parseInt(document.getElementById('deviceCount').value);
+            const selectedDevices = Array.from(document.querySelectorAll('input[name="devices"]:checked')).map(cb => cb.value);
+
+            if (selectedDevices.length === 0) {
+                alert('Por favor, selecciona al menos un tipo de dispositivo');
+                return;
+            }
+
+            let html = '<div class="success-box">✓ Diseño de infraestructura generado</div>';
+            html += `<div class="info-box"><strong>Topología:</strong> ${topology.toUpperCase()} | <strong>Dispositivos:</strong> ${deviceCount}</div>`;
+
+            // Generate SVG diagram
+            let svg = generateTopologySVG(topology, deviceCount, selectedDevices);
+            html += `<div class="diagram">${svg}</div>`;
+
+            // Add description
+            html += `<div class="info-box">
+                <strong>Descripción:</strong><br>
+                Topología ${topology === 'star' ? 'Estrella' : topology === 'mesh' ? 'Malla' : 'Híbrida'} con ${deviceCount} dispositivos.<br>
+                Dispositivos: ${selectedDevices.map(d => d.toUpperCase()).join(', ')}<br>
+                <strong>Ventajas:</strong> ${getTopologyAdvantages(topology)}
+            </div>`;
+
+            document.getElementById('infrastructureResults').innerHTML = html;
+            switchTab('infrastructure');
+        }
+
+        function generateTopologySVG(topology, deviceCount, devices) {
+            const width = 600;
+            const height = 400;
+            let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+            svg += `<rect width="${width}" height="${height}" fill="#f8f9fa" stroke="#ddd" stroke-width="2"/>`;
+
+            if (topology === 'star') {
+                // Central device
+                svg += `<circle cx="300" cy="200" r="30" fill="#667eea" stroke="#333" stroke-width="2"/>`;
+                svg += `<text x="300" y="205" text-anchor="middle" fill="white" font-weight="bold">Core</text>`;
+
+                // Surrounding devices
+                const radius = 120;
+                for (let i = 0; i < deviceCount - 1; i++) {
+                    const angle = (i / (deviceCount - 1)) * Math.PI * 2 - Math.PI / 2;
+                    const x = 300 + radius * Math.cos(angle);
+                    const y = 200 + radius * Math.sin(angle);
+
+                    svg += `<line x1="300" y1="200" x2="${x}" y2="${y}" stroke="#667eea" stroke-width="2"/>`;
+                    svg += `<circle cx="${x}" cy="${y}" r="20" fill="#764ba2" stroke="#333" stroke-width="2"/>`;
+                    svg += `<text x="${x}" y="${y + 5}" text-anchor="middle" fill="white" font-size="12">D${i + 1}</text>`;
+                }
+            } else if (topology === 'mesh') {
+                // Arrange devices in circle
+                const radius = 100;
+                const positions = [];
+
+                for (let i = 0; i < deviceCount; i++) {
+                    const angle = (i / deviceCount) * Math.PI * 2;
+                    const x = 300 + radius * Math.cos(angle);
+                    const y = 200 + radius * Math.sin(angle);
+                    positions.push({ x, y, i });
+
+                    // Draw connections to all other devices
+                    for (let j = 0; j < i; j++) {
+                        svg += `<line x1="${positions[j].x}" y1="${positions[j].y}" x2="${x}" y2="${y}" stroke="#ddd" stroke-width="1" stroke-dasharray="5,5"/>`;
+                    }
+                }
+
+                // Draw devices
+                positions.forEach(pos => {
+                    svg += `<circle cx="${pos.x}" cy="${pos.y}" r="20" fill="#667eea" stroke="#333" stroke-width="2"/>`;
+                    svg += `<text x="${pos.x}" y="${pos.y + 5}" text-anchor="middle" fill="white" font-size="12">D${pos.i + 1}</text>`;
+                });
+            } else {
+                // Hybrid topology
+                svg += `<circle cx="300" cy="200" r="30" fill="#667eea" stroke="#333" stroke-width="2"/>`;
+                svg += `<text x="300" y="205" text-anchor="middle" fill="white" font-weight="bold">Core</text>`;
+
+                const radius = 100;
+                for (let i = 0; i < deviceCount - 1; i++) {
+                    const angle = (i / (deviceCount - 1)) * Math.PI * 2 - Math.PI / 2;
+                    const x = 300 + radius * Math.cos(angle);
+                    const y = 200 + radius * Math.sin(angle);
+
+                    svg += `<line x1="300" y1="200" x2="${x}" y2="${y}" stroke="#667eea" stroke-width="2"/>`;
+                    svg += `<circle cx="${x}" cy="${y}" r="20" fill="#764ba2" stroke="#333" stroke-width="2"/>`;
+                    svg += `<text x="${x}" y="${y + 5}" text-anchor="middle" fill="white" font-size="12">D${i + 1}</text>`;
+                }
+            }
+
+            svg += `</svg>`;
+            return svg;
+        }
+
+        function getTopologyAdvantages(topology) {
+            const advantages = {
+                star: 'Fácil de administrar, escalable, punto único de fallo',
+                mesh: 'Redundancia total, sin puntos únicos de fallo, alta disponibilidad',
+                hybrid: 'Equilibrio entre costo y redundancia, escalabilidad mejorada'
+            };
+            return advantages[topology] || '';
+        }
+
+        // Command Generator Functions
+        function generateCommands() {
+            const selectedVendors = Array.from(document.querySelectorAll('input[name="vendors"]:checked')).map(cb => cb.value);
+            const hostname = document.getElementById('hostname').value || 'router1';
+            const deviceType = document.getElementById('deviceType').value;
+
+            if (selectedVendors.length === 0) {
+                alert('Por favor, selecciona al menos un fabricante');
+                return;
+            }
+
+            let html = '<div class="success-box">✓ Comandos generados para los fabricantes seleccionados</div>';
+
+            selectedVendors.forEach(vendor => {
+                const commands = generateVendorCommands(vendor, hostname, deviceType);
+                html += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #667eea; margin-bottom: 10px;">🔧 ${getVendorName(vendor)}</h3>
+                        <div class="command-item">
+                            ${commands.split('\n').map(cmd => `<div>${escapeHtml(cmd)}</div>`).join('')}
+                        </div>
+                        <button class="copy-button" onclick="copyToClipboard(\`${commands.replace(/`/g, '\\`')}\`)">Copiar Comandos</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('commandResults').innerHTML = html;
+            switchTab('commands');
+        }
+
+        function generateVendorCommands(vendor, hostname, deviceType) {
+            let commands = '';
+
+            if (vendor === 'cisco') {
+                commands = `! Configuración Cisco IOS para ${deviceType}
+configure terminal
+hostname ${hostname}
+!
+! Configuración de Interfaces
+interface GigabitEthernet0/0
+ description Conexión WAN
+ ip address 203.0.113.1 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description Conexión LAN
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+!
+! Configuración de Routing
+router ospf 1
+ network 192.168.1.0 0.0.0.255 area 0
+ network 203.0.113.0 0.0.0.255 area 0
+!
+! Configuración de VLAN
+vlan 10
+ name Sales
+vlan 20
+ name IT
+vlan 30
+ name Servers
+!
+! Configuración de Seguridad
+access-list 101 permit ip any any
+!
+end
+write memory`;
+            } else if (vendor === 'huawei') {
+                commands = `# Configuración Huawei VRP para ${deviceType}
+<Huawei> system-view
+[Huawei] sysName ${hostname}
+#
+# Configuración de Interfaces
+[${hostname}] interface GigabitEthernet 0/0/0
+[${hostname}-GigabitEthernet0/0/0] description Conexión WAN
+[${hostname}-GigabitEthernet0/0/0] ip address 203.0.113.1 255.255.255.0
+[${hostname}-GigabitEthernet0/0/0] undo shutdown
+[${hostname}-GigabitEthernet0/0/0] quit
+#
+[${hostname}] interface GigabitEthernet 0/0/1
+[${hostname}-GigabitEthernet0/0/1] description Conexión LAN
+[${hostname}-GigabitEthernet0/0/1] ip address 192.168.1.1 255.255.255.0
+[${hostname}-GigabitEthernet0/0/1] undo shutdown
+[${hostname}-GigabitEthernet0/0/1] quit
+#
+# Configuración de VLAN
+[${hostname}] vlan batch 10 20 30
+[${hostname}] vlan 10
+[${hostname}-vlan10] name Sales
+[${hostname}-vlan10] quit
+[${hostname}] vlan 20
+[${hostname}-vlan20] name IT
+[${hostname}-vlan20] quit
+#
+# Configuración de Routing
+[${hostname}] ospf 1
+[${hostname}-ospf-1] area 0.0.0.0
+[${hostname}-ospf-1-area-0.0.0.0] network 192.168.1.0 0.0.0.255
+[${hostname}-ospf-1-area-0.0.0.0] network 203.0.113.0 0.0.0.255
+#
+save`;
+            } else if (vendor === 'fortinet') {
+                commands = `# Configuración Fortinet FortiOS para ${deviceType}
+config system global
+    set hostname ${hostname}
+end
+#
+# Configuración de Interfaces
+config system interface
+    edit port1
+        set alias WAN
+        set ip 203.0.113.1 255.255.255.0
+        set allowaccess ping http https ssh
+    next
+    edit port2
+        set alias LAN
+        set ip 192.168.1.1 255.255.255.0
+        set allowaccess ping http https ssh
+    next
+end
+#
+# Configuración de VLAN
+config system vlan
+    edit vlan10
+        set vlanid 10
+        set vlanname Sales
+        set interface port2
+    next
+    edit vlan20
+        set vlanid 20
+        set vlanname IT
+        set interface port2
+    next
+end
+#
+# Configuración de Firewall
+config firewall policy
+    edit 1
+        set name Allow-LAN-to-WAN
+        set srcintf port2
+        set dstintf port1
+        set srcaddr all
+        set dstaddr all
+        set action accept
+        set schedule always
+        set service ALL
+    next
+end
+#
+# Guardar configuración
+execute backup config`;
+            }
+
+            return commands;
+        }
+
+        function getVendorName(vendor) {
+            const names = {
+                cisco: 'Cisco IOS',
+                huawei: 'Huawei VRP',
+                fortinet: 'Fortinet FortiOS'
+            };
+            return names[vendor] || vendor;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Initialize
+        window.addEventListener('load', function() {
+            console.log('Network Planner AI cargado correctamente');
+        });
+    </script>
+</body>
+</html>
