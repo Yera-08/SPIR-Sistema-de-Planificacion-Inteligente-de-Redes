@@ -1,0 +1,9 @@
+IP,marca,usuario
+192.168.1.1,Cisco IOS-XE,admin
+192.168.1.2,Fortinet FortiOS,admin
+192.168.1.5,Huawei VRP,manager
+192.168.1.10,Arista EOS,admin
+10.0.0.1,Cisco IOS,admin
+10.0.0.2,Arista EOS,admin
+172.16.0.1,Fortinet FortiOS,admin
+172.16.0.5,Huawei VRP,root
