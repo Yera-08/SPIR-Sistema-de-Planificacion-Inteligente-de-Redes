@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="es-LA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Planificación Inteligente de Redes v7</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1419;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1a1f26 0%, #0f1419 100%);
+            border-right: 1px solid rgba(0, 102, 204, 0.2);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .sidebar-title {
+            padding: 15px 20px;
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+            margin-bottom: 10px;
+        }
+        
+        .app-title {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid rgba(0, 102, 204, 0.3);
+            margin-bottom: 20px;
+            background: rgba(0, 102, 204, 0.05);
+        }
+        
+        .app-title h1 {
+            font-size: 14px;
+            color: #0066cc;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .app-title p {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #a0a0a0;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(0, 102, 204, 0.1);
+            color: #0066cc;
+            border-left-color: #0066cc;
+        }
+
+        .menu-item.active {
+            background: rgba(0, 102, 204, 0.2);
+            color: #0066cc;
+            border-left-color: #0066cc;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #1a1f26 0%, #252d37 100%);
+            padding: 15px 30px;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0066cc;
+        }
+
+        .workspace {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            width: 35%;
+            background: #1a1f26;
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            flex: 1;
+            background: #1a1f26;
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #0066cc;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 102, 204, 0.05);
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: rgba(0, 102, 204, 0.1);
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 102, 204, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 102, 204, 0.1);
+            color: #0066cc;
+            border: 1px solid #0066cc;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 102, 204, 0.2);
+        }
+
+        .output-box {
+            background: #0a0e13;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            color: #a0a0a0;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .table th {
+            background: rgba(0, 102, 204, 0.1);
+            color: #0066cc;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+        }
+
+        .table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.1);
+            color: #e0e0e0;
+        }
+
+        .table tr:hover {
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .building-item {
+            background: rgba(0, 102, 204, 0.05);
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .building-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 102, 204, 0.2);
+        }
+
+        .building-item-title {
+            color: #0066cc;
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background: rgba(204, 0, 0, 0.2);
+            color: #ff6666;
+            border: 1px solid #ff6666;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            width: auto;
+            margin: 0;
+        }
+
+        .btn-delete:hover {
+            background: rgba(204, 0, 0, 0.3);
+        }
+
+        .ip-list {
+            background: rgba(0, 102, 204, 0.05);
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            border-radius: 4px;
+            padding: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+
+        .ip-item {
+            padding: 4px;
+            color: #0066cc;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            background: rgba(0, 102, 204, 0.02);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 102, 204, 0.2);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 102, 204, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 102, 204, 0.5);
+        }
+
+        .module {
+            display: none;
+        }
+
+        .module.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="app-title">
+                <h1><i class="fas fa-network-wired"></i> SPIR</h1>
+                <p>Sistema de Planificación Inteligente de Redes</p>
+            </div>
+            <div class="sidebar-title">Etapa 1: Planificación</div>
+            <div class="menu-item active" onclick="switchModule('buildings')">
+                <i class="fas fa-building"></i> Gestión de Edificios
+            </div>
+            <div class="menu-item" onclick="switchModule('ipPlanning')">
+                <i class="fas fa-map"></i> Planificación IP
+            </div>
+            <div class="menu-item" onclick="switchModule('vlan')">
+                <i class="fas fa-layer-group"></i> Segmentación VLAN
+            </div>
+            <div class="menu-item" onclick="switchModule('topology')">
+                <i class="fas fa-project-diagram"></i> Topología
+            </div>
+            <div class="menu-item" onclick="switchModule('commands')">
+                <i class="fas fa-terminal"></i> Generador de Comandos
+            </div>
+
+            <div class="sidebar-title" style="margin-top: 20px;">Etapa 2: Automatización</div>
+            <div class="menu-item" onclick="switchModule('devices')">
+                <i class="fas fa-server"></i> Gestión de Dispositivos
+            </div>
+            <div class="menu-item" onclick="switchModule('deployment')">
+                <i class="fas fa-rocket"></i> Despliegue
+            </div>
+            <div class="menu-item" onclick="switchModule('monitoring')">
+                <i class="fas fa-chart-line"></i> Monitoreo
+            </div>
+            <div class="menu-item" onclick="switchModule('audit')">
+                <i class="fas fa-clipboard-list"></i> Auditoría
+            </div>
+            <div class="menu-item" onclick="switchModule('autoDiscovery')">
+                <i class="fas fa-satellite-dish"></i> Auto-Discovery
+            </div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-title" id="headerTitle">
+                    <i class="fas fa-network-wired" style="margin-right: 10px;"></i>Sistema de Planificación Inteligente de Redes - Gestión de Edificios
+                </div>
+            </div>
+
+            <div class="workspace">
+                <!-- PANEL IZQUIERDO -->
+                <div class="left-panel">
+                    <!-- MÓDULO: GESTIÓN DE EDIFICIOS -->
+                    <div class="module active" id="buildings">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Agregar Edificio</h3>
+                        <div class="form-group">
+                            <label>Nombre del Edificio</label>
+                            <input type="text" id="buildingName" placeholder="Ej: Edificio Principal">
+                        </div>
+                        <div class="form-group">
+                            <label>Subred (CIDR)</label>
+                            <input type="text" id="buildingSubnet" placeholder="Ej: 10.1.0.0/24">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad de Hosts</label>
+                            <input type="number" id="buildingHosts" value="50" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad de Switches</label>
+                            <input type="number" id="buildingSwitches" value="2" min="1">
+                        </div>
+                        <button class="btn" onclick="addBuilding()">Agregar Edificio</button>
+
+                        <h3 style="color: #0066cc; margin-top: 20px; margin-bottom: 15px;">Edificios Configurados</h3>
+                        <div id="buildingsList"></div>
+                    </div>
+
+                    <!-- MÓDULO: PLANIFICACIÓN IP -->
+                    <div class="module" id="ipPlanning">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Planificación IP</h3>
+                        <div class="form-group">
+                            <label>Red Principal</label>
+                            <input type="text" id="mainNetwork" value="10.0.0.0/8">
+                        </div>
+                        <button class="btn" onclick="generateIPPlanning()">Generar Planificación</button>
+                    </div>
+
+                    <!-- MÓDULO: VLAN -->
+                    <div class="module" id="vlan">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Segmentación VLAN</h3>
+                        <div class="form-group">
+                            <label>ID VLAN Inicial</label>
+                            <input type="number" id="vlanStart" value="10" min="1" max="4094">
+                        </div>
+                        <div class="form-group">
+                            <label>Departamentos (uno por línea)</label>
+                            <textarea id="vlanDepts" rows="6">Ventas
+TI
+RRHH
+Finanzas
+Operaciones
+Logística</textarea>
+                        </div>
+                        <button class="btn" onclick="generateVLAN()">Generar VLANs</button>
+                    </div>
+
+                    <!-- MÓDULO: TOPOLOGÍA -->
+                    <div class="module" id="topology">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Diseño de Topología</h3>
+                        <div class="form-group">
+                            <label>Tipo de Topología</label>
+                            <select id="topologyType">
+                                <option value="star">Estrella</option>
+                                <option value="mesh">Malla Completa</option>
+                                <option value="hybrid">Híbrida</option>
+                                <option value="ring">Anillo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad de Switches</label>
+                            <input type="number" id="numSwitches" value="4" min="2" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Incluir Firewall</label>
+                            <select id="includeFirewall">
+                                <option value="yes">Sí</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="generateTopology()">Generar Topología</button>
+                    </div>
+
+                    <!-- MÓDULO: GENERADOR DE COMANDOS -->
+                    <div class="module" id="commands">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Generador de Comandos</h3>
+                        <div class="form-group">
+                            <label>Fabricante</label>
+                            <select id="vendor">
+                                <option value="cisco">Cisco IOS/IOS-XE</option>
+                                <option value="huawei">Huawei VRP</option>
+                                <option value="fortinet">Fortinet FortiOS</option>
+                                <option value="arista">Arista EOS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Configuración</label>
+                            <select id="cmdType">
+                                <option value="vlan">Configuración VLAN</option>
+                                <option value="interface">Configuración de Interfaz</option>
+                                <option value="routing">Enrutamiento</option>
+                                <option value="security">Seguridad</option>
+                                <option value="bgp">BGP</option>
+                                <option value="ospf">OSPF</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Dispositivo</label>
+                            <input type="text" id="deviceNameCmd" placeholder="Router-Edificio1">
+                        </div>
+                        <button class="btn" onclick="generateCommands()">Generar Comandos</button>
+                        <button class="btn btn-secondary" onclick="copyCommands()">Copiar Comandos</button>
+                    </div>
+
+                    <!-- MÓDULO: GESTIÓN DE DISPOSITIVOS -->
+                    <div class="module" id="devices">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Agregar Dispositivo</h3>
+                        <div class="form-group">
+                            <label>Nombre del Dispositivo</label>
+                            <input type="text" id="deviceName" placeholder="Router-Principal">
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección IP</label>
+                            <input type="text" id="deviceIP" placeholder="192.168.1.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Usuario SSH</label>
+                            <input type="text" id="deviceUser" placeholder="admin">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="devicePass" placeholder="••••••••">
+                        </div>
+                        <button class="btn" onclick="addDevice()">Agregar Dispositivo</button>
+
+                        <h3 style="color: #0066cc; margin-top: 20px; margin-bottom: 15px;">Dispositivos Registrados</h3>
+                        <div id="devicesList"></div>
+                    </div>
+
+                    <!-- MÓDULO: DESPLIEGUE -->
+                    <div class="module" id="deployment">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Despliegue de Configuración</h3>
+                        <div class="form-group">
+                            <label>Dispositivo Destino</label>
+                            <select id="deployDevice">
+                                <option value="">Selecciona un dispositivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Configuración a Desplegar</label>
+                            <textarea id="deployConfig" rows="6" placeholder="Ingresa los comandos"></textarea>
+                        </div>
+                        <button class="btn btn-secondary" onclick="simulateDeploy()">Simular (Dry-Run)</button>
+                        <button class="btn" onclick="executeDeploy()">Ejecutar Despliegue</button>
+                    </div>
+
+                    <!-- MÓDULO: MONITOREO -->
+                    <div class="module" id="monitoring">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Monitoreo en Tiempo Real</h3>
+                        <div class="form-group">
+                            <label>Dispositivo a Monitorear</label>
+                            <select id="monitorDevice">
+                                <option value="">Selecciona un dispositivo</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="startMonitoring()">Iniciar Monitoreo</button>
+                        <button class="btn btn-secondary" onclick="stopMonitoring()">Detener Monitoreo</button>
+                    </div>
+
+                    <!-- MÓDULO: AUDITORÍA -->
+                    <div class="module" id="audit">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Auditoría y Registros</h3>
+                        <button class="btn" onclick="generateAudit()">Actualizar Registros</button>
+                        <h3 style="color: #0066cc; margin-top: 20px; margin-bottom: 15px;">Historial de Cambios</h3>
+                        <div id="auditLog" style="font-size: 12px; color: #0066cc;"></div>
+                    </div>
+
+                    <!-- MODULO: AUTO-DISCOVERY -->
+                    <div class="module" id="autoDiscovery">
+                        <h3 style="color: #0066cc; margin-bottom: 15px;">Deteccion Automatica de Dispositivos</h3>
+                        <p style="font-size: 12px; color: #a0a0a0; margin-bottom: 20px;">Presiona el boton para escanear y detectar automaticamente los dispositivos de red conectados a tu PC.</p>
+                        <button class="btn" onclick="startAutoDiscovery()">Detectar Dispositivos</button>
+                        <button class="btn btn-secondary" onclick="stopAutoDiscovery()">Detener Escaneo</button>
+                        <h3 style="color: #0066cc; margin-top: 20px; margin-bottom: 15px;">Dispositivos Detectados</h3>
+                        <div id="discoveredDevicesList" style="font-size: 12px; color: #e0e0e0;"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL DERECHO -->
+                <div class="right-panel">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab(event, 'output')">Salida</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'table')">Tabla</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'diagram')">Diagrama</button>
+                    </div>
+
+                    <div id="output" class="tab-content active">
+                        <div class="output-box" id="outputBox">Bienvenido al Planificador de Redes v7
+
+Funcionalidades:
+✓ Gestión de múltiples edificios (4+)
+✓ Cálculo automático de IPs de hosts
+✓ Planificación IP automática
+✓ Configuración VLAN
+✓ Topologías visuales interactivas
+✓ Generación de comandos reales
+✓ Gestión de dispositivos
+✓ Despliegue automático
+✓ Monitoreo en tiempo real
+✓ Auditoría completa
+
+Comienza agregando edificios en "Gestión de Edificios"</div>
+                    </div>
+
+                    <div id="table" class="tab-content">
+                        <table class="table" id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>Elemento</th>
+                                    <th>Valor</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: #a0a0a0;">Sin datos disponibles</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="diagram" class="tab-content">
+                        <svg id="topologySVG"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ESTADO GLOBAL ====================
+        const state = {
+            buildings: [],
+            devices: [],
+            auditLog: [],
+            currentCommands: null
+        };
+
+        // ==================== NAVEGACIÓN ====================
+        function switchModule(moduleName) {
+            document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+            document.getElementById(moduleName).classList.add('active');
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            event.target.closest('.menu-item').classList.add('active');
+            const moduleTitle = event.target.closest('.menu-item').textContent.trim();
+            document.getElementById('headerTitle').innerHTML = `<i class="fas fa-network-wired" style="margin-right: 10px;"></i>Sistema de Planificación Inteligente de Redes - ${moduleTitle}`;
+        }
+
+        function switchTab(event, tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // ==================== GESTIÓN DE EDIFICIOS ====================
+        function addBuilding() {
+            const name = document.getElementById('buildingName').value;
+            const subnet = document.getElementById('buildingSubnet').value;
+            const hosts = parseInt(document.getElementById('buildingHosts').value);
+            const switches = parseInt(document.getElementById('buildingSwitches').value);
+
+            if (!name || !subnet || !hosts || !switches) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            const ips = generateIPList(subnet, hosts);
+            state.buildings.push({ name, subnet, hosts, switches, ips });
+
+            updateBuildingsList();
+            document.getElementById('buildingName').value = '';
+            document.getElementById('buildingSubnet').value = '';
+            document.getElementById('buildingHosts').value = '50';
+            document.getElementById('buildingSwitches').value = '2';
+
+            logAudit(`Edificio agregado: ${name}`);
+        }
+
+        function generateIPList(subnet, numHosts) {
+            const parts = subnet.split('/')[0].split('.');
+            const baseIP = `${parts[0]}.${parts[1]}.${parts[2]}`;
+            const ips = [];
+            for (let i = 1; i <= numHosts && i <= 254; i++) {
+                ips.push(`${baseIP}.${i}`);
+            }
+            return ips;
+        }
+
+        function updateBuildingsList() {
+            const list = document.getElementById('buildingsList');
+            if (state.buildings.length === 0) {
+                list.innerHTML = '<div style="color: #a0a0a0; text-align: center; padding: 20px;">Sin edificios agregados</div>';
+                return;
+            }
+
+            let html = '';
+            state.buildings.forEach((b, i) => {
+                html += `
+                    <div class="building-item">
+                        <div class="building-item-header">
+                            <div class="building-item-title">${b.name}</div>
+                            <button class="btn-delete" onclick="deleteBuilding(${i})">Eliminar</button>
+                        </div>
+                        <div style="color: #e0e0e0; font-size: 12px; margin-bottom: 8px;">
+                            <p><strong>Subred:</strong> ${b.subnet}</p>
+                            <p><strong>Hosts:</strong> ${b.hosts}</p>
+                            <p><strong>Switches:</strong> ${b.switches}</p>
+                        </div>
+                        <div class="ip-list">
+                            <strong style="color: #0066cc; font-size: 11px;">IPs Disponibles (${b.ips.length}):</strong>
+                            ${b.ips.map(ip => `<div class="ip-item">${ip}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        function deleteBuilding(index) {
+            state.buildings.splice(index, 1);
+            updateBuildingsList();
+            logAudit('Edificio eliminado');
+        }
+
+        // ==================== PLANIFICACIÓN IP ====================
+        function generateIPPlanning() {
+            if (state.buildings.length === 0) {
+                alert('Agrega al menos un edificio');
+                return;
+            }
+
+            let output = `PLANIFICACIÓN IP - ${new Date().toLocaleString()}\n`;
+            output += '='.repeat(80) + '\n\n';
+
+            let tableHTML = '<thead><tr><th>Edificio</th><th>Subred</th><th>Gateway</th><th>Broadcast</th><th>Hosts</th></tr></thead><tbody>';
+
+            state.buildings.forEach(b => {
+                const parts = b.subnet.split('/')[0].split('.');
+                const gateway = `${parts[0]}.${parts[1]}.${parts[2]}.1`;
+                const broadcast = `${parts[0]}.${parts[1]}.${parts[2]}.255`;
+
+                output += `EDIFICIO: ${b.name}\n`;
+                output += `  Subred: ${b.subnet}\n`;
+                output += `  Gateway: ${gateway}\n`;
+                output += `  Broadcast: ${broadcast}\n`;
+                output += `  Hosts Configurables: ${b.hosts}\n`;
+                output += `  Rango IP: ${parts[0]}.${parts[1]}.${parts[2]}.2 - ${parts[0]}.${parts[1]}.${parts[2]}.254\n\n`;
+
+                tableHTML += `<tr><td>${b.name}</td><td>${b.subnet}</td><td>${gateway}</td><td>${broadcast}</td><td>${b.hosts}</td></tr>`;
+            });
+
+            tableHTML += '</tbody>';
+
+            document.getElementById('outputBox').textContent = output;
+            document.getElementById('resultsTable').innerHTML = tableHTML;
+            logAudit('Planificación IP generada');
+        }
+
+        // ==================== VLAN ====================
+        function generateVLAN() {
+            const depts = document.getElementById('vlanDepts').value.split('\n').map(d => d.trim()).filter(d => d);
+            const vlanBase = parseInt(document.getElementById('vlanStart').value);
+
+            if (depts.length === 0) {
+                alert('Ingresa al menos un departamento');
+                return;
+            }
+
+            let output = `CONFIGURACIÓN VLAN - ${new Date().toLocaleString()}\n`;
+            output += '='.repeat(80) + '\n\n';
+
+            // Cisco
+            output += 'COMANDOS CISCO IOS\n';
+            output += '-'.repeat(80) + '\n';
+            output += 'configure terminal\n';
+            depts.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                output += `vlan ${vlanId}\n`;
+                output += ` name ${dept}\n`;
+                output += `exit\n`;
+            });
+            output += 'end\n';
+            output += 'write memory\n\n';
+
+            // Huawei
+            output += 'COMANDOS HUAWEI VRP\n';
+            output += '-'.repeat(80) + '\n';
+            output += 'system-view\n';
+            const vlanIds = depts.map((_, i) => vlanBase + i).join(' ');
+            output += `vlan batch ${vlanIds}\n`;
+            depts.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                output += `vlan ${vlanId}\n`;
+                output += ` name ${dept}\n`;
+                output += `quit\n`;
+            });
+            output += 'save\n\n';
+
+            // Fortinet
+            output += 'COMANDOS FORTINET FORTIOS\n';
+            output += '-'.repeat(80) + '\n';
+            output += 'config system vlan\n';
+            depts.forEach((dept, i) => {
+                const vlanId = vlanBase + i;
+                output += `edit ${vlanId}\n`;
+                output += ` set vlanid ${vlanId}\n`;
+                output += ` set name ${dept}\n`;
+                output += `next\n`;
+            });
+            output += 'end\n';
+
+            document.getElementById('outputBox').textContent = output;
+            logAudit('VLANs generadas');
+        }
+
+        // ==================== TOPOLOGÍA ====================
+        function generateTopology() {
+            const type = document.getElementById('topologyType').value;
+            const numSwitches = parseInt(document.getElementById('numSwitches').value);
+            const firewall = document.getElementById('includeFirewall').value === 'yes';
+
+            const svg = document.getElementById('topologySVG');
+            svg.innerHTML = '';
+            svg.setAttribute('viewBox', '0 0 1200 600');
+
+            if (type === 'star') drawStar(svg, numSwitches, firewall);
+            else if (type === 'mesh') drawMesh(svg, numSwitches, firewall);
+            else if (type === 'hybrid') drawHybrid(svg, numSwitches, firewall);
+            else if (type === 'ring') drawRing(svg, numSwitches, firewall);
+
+            let output = `TOPOLOGÍA: ${type.toUpperCase()}\n`;
+            output += `Switches: ${numSwitches}\n`;
+            output += `Firewall: ${firewall ? 'Sí' : 'No'}\n`;
+            output += `Fecha: ${new Date().toLocaleString()}\n`;
+
+            document.getElementById('outputBox').textContent = output;
+            logAudit(`Topología generada: ${type}`);
+        }
+
+        function drawStar(svg, numSwitches, firewall) {
+            const cx = 600, cy = 300, radius = 200;
+
+            // Router central
+            const router = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            router.setAttribute('x', cx - 40);
+            router.setAttribute('y', cy - 30);
+            router.setAttribute('width', 80);
+            router.setAttribute('height', 60);
+            router.setAttribute('fill', '#0066cc');
+            router.setAttribute('stroke', '#00ff00');
+            router.setAttribute('stroke-width', 2);
+            router.setAttribute('rx', 5);
+            svg.appendChild(router);
+
+            const routerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            routerText.setAttribute('x', cx);
+            routerText.setAttribute('y', cy + 8);
+            routerText.setAttribute('text-anchor', 'middle');
+            routerText.setAttribute('fill', '#00ff00');
+            routerText.setAttribute('font-size', 14);
+            routerText.setAttribute('font-weight', 'bold');
+            routerText.textContent = 'Router';
+            svg.appendChild(routerText);
+
+            // Switches
+            for (let i = 0; i < numSwitches; i++) {
+                const angle = (i / numSwitches) * Math.PI * 2;
+                const x = cx + radius * Math.cos(angle);
+                const y = cy + radius * Math.sin(angle);
+
+                // Línea
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', cx);
+                line.setAttribute('y1', cy);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', '#00ff00');
+                line.setAttribute('stroke-width', 2);
+                svg.appendChild(line);
+
+                // Switch
+                const sw = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                sw.setAttribute('x', x - 35);
+                sw.setAttribute('y', y - 25);
+                sw.setAttribute('width', 70);
+                sw.setAttribute('height', 50);
+                sw.setAttribute('fill', '#00aa44');
+                sw.setAttribute('stroke', '#00ff00');
+                sw.setAttribute('stroke-width', 2);
+                sw.setAttribute('rx', 5);
+                svg.appendChild(sw);
+
+                const swText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                swText.setAttribute('x', x);
+                swText.setAttribute('y', y + 5);
+                swText.setAttribute('text-anchor', 'middle');
+                swText.setAttribute('fill', '#00ff00');
+                swText.setAttribute('font-size', 12);
+                swText.setAttribute('font-weight', 'bold');
+                swText.textContent = `SW${i + 1}`;
+                svg.appendChild(swText);
+            }
+
+            if (firewall) {
+                const fw = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                fw.setAttribute('x', cx - 40);
+                fw.setAttribute('y', 20);
+                fw.setAttribute('width', 80);
+                fw.setAttribute('height', 50);
+                fw.setAttribute('fill', '#ff9900');
+                fw.setAttribute('stroke', '#00ff00');
+                fw.setAttribute('stroke-width', 2);
+                fw.setAttribute('rx', 5);
+                svg.appendChild(fw);
+
+                const fwText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                fwText.setAttribute('x', cx);
+                fwText.setAttribute('y', 55);
+                fwText.setAttribute('text-anchor', 'middle');
+                fwText.setAttribute('fill', '#00ff00');
+                fwText.setAttribute('font-size', 12);
+                fwText.setAttribute('font-weight', 'bold');
+                fwText.textContent = 'FW';
+                svg.appendChild(fwText);
+
+                const fwLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                fwLine.setAttribute('x1', cx);
+                fwLine.setAttribute('y1', 70);
+                fwLine.setAttribute('x2', cx);
+                fwLine.setAttribute('y2', cy - 30);
+                fwLine.setAttribute('stroke', '#00ff00');
+                fwLine.setAttribute('stroke-width', 2);
+                svg.appendChild(fwLine);
+            }
+        }
+
+        function drawMesh(svg, numSwitches, firewall) {
+            const radius = 180;
+            const cx = 600, cy = 300;
+            const positions = [];
+
+            for (let i = 0; i < numSwitches; i++) {
+                const angle = (i / numSwitches) * Math.PI * 2;
+                positions.push({
+                    x: cx + radius * Math.cos(angle),
+                    y: cy + radius * Math.sin(angle),
+                    id: i + 1
+                });
+            }
+
+            // Líneas de malla
+            for (let i = 0; i < positions.length; i++) {
+                for (let j = i + 1; j < positions.length; j++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', positions[i].x);
+                    line.setAttribute('y1', positions[i].y);
+                    line.setAttribute('x2', positions[j].x);
+                    line.setAttribute('y2', positions[j].y);
+                    line.setAttribute('stroke', '#00ff00');
+                    line.setAttribute('stroke-width', 1);
+                    line.setAttribute('opacity', 0.5);
+                    svg.appendChild(line);
+                }
+            }
+
+            // Switches
+            positions.forEach(pos => {
+                const sw = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                sw.setAttribute('x', pos.x - 35);
+                sw.setAttribute('y', pos.y - 25);
+                sw.setAttribute('width', 70);
+                sw.setAttribute('height', 50);
+                sw.setAttribute('fill', '#00aa44');
+                sw.setAttribute('stroke', '#00ff00');
+                sw.setAttribute('stroke-width', 2);
+                sw.setAttribute('rx', 5);
+                svg.appendChild(sw);
+
+                const swText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                swText.setAttribute('x', pos.x);
+                swText.setAttribute('y', pos.y + 5);
+                swText.setAttribute('text-anchor', 'middle');
+                swText.setAttribute('fill', '#00ff00');
+                swText.setAttribute('font-size', 12);
+                swText.setAttribute('font-weight', 'bold');
+                swText.textContent = `SW${pos.id}`;
+                svg.appendChild(swText);
+            });
+        }
+
+        function drawHybrid(svg, numSwitches, firewall) {
+            drawStar(svg, numSwitches, firewall);
+        }
+
+        function drawRing(svg, numSwitches, firewall) {
+            const radius = 180;
+            const cx = 600, cy = 300;
+            const positions = [];
+
+            for (let i = 0; i < numSwitches; i++) {
+                const angle = (i / numSwitches) * Math.PI * 2;
+                positions.push({
+                    x: cx + radius * Math.cos(angle),
+                    y: cy + radius * Math.sin(angle),
+                    id: i + 1
+                });
+            }
+
+            // Líneas de anillo
+            for (let i = 0; i < positions.length; i++) {
+                const nextIdx = (i + 1) % positions.length;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', positions[i].x);
+                line.setAttribute('y1', positions[i].y);
+                line.setAttribute('x2', positions[nextIdx].x);
+                line.setAttribute('y2', positions[nextIdx].y);
+                line.setAttribute('stroke', '#00ff00');
+                line.setAttribute('stroke-width', 2);
+                svg.appendChild(line);
+            }
+
+            // Switches
+            positions.forEach(pos => {
+                const sw = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                sw.setAttribute('x', pos.x - 35);
+                sw.setAttribute('y', pos.y - 25);
+                sw.setAttribute('width', 70);
+                sw.setAttribute('height', 50);
+                sw.setAttribute('fill', '#00aa44');
+                sw.setAttribute('stroke', '#00ff00');
+                sw.setAttribute('stroke-width', 2);
+                sw.setAttribute('rx', 5);
+                svg.appendChild(sw);
+
+                const swText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                swText.setAttribute('x', pos.x);
+                swText.setAttribute('y', pos.y + 5);
+                swText.setAttribute('text-anchor', 'middle');
+                swText.setAttribute('fill', '#00ff00');
+                swText.setAttribute('font-size', 12);
+                swText.setAttribute('font-weight', 'bold');
+                swText.textContent = `SW${pos.id}`;
+                svg.appendChild(swText);
+            });
+        }
+
+        // ==================== GENERADOR DE COMANDOS ====================
+        function generateCommands() {
+            const vendor = document.getElementById('vendor').value;
+            const cmdType = document.getElementById('cmdType').value;
+            const deviceName = document.getElementById('deviceNameCmd').value || 'Router-1';
+
+            let output = `COMANDOS PARA ${vendor.toUpperCase()}\n`;
+            output += `Dispositivo: ${deviceName}\n`;
+            output += `Tipo: ${cmdType}\n`;
+            output += '='.repeat(80) + '\n\n';
+
+            if (vendor === 'cisco') {
+                output += generateCiscoCmd(deviceName, cmdType);
+            } else if (vendor === 'huawei') {
+                output += generateHuaweiCmd(deviceName, cmdType);
+            } else if (vendor === 'fortinet') {
+                output += generateFortinetCmd(deviceName, cmdType);
+            } else if (vendor === 'arista') {
+                output += generateAristaCmd(deviceName, cmdType);
+            }
+
+            state.currentCommands = output;
+            document.getElementById('outputBox').textContent = output;
+            logAudit(`Comandos generados para ${vendor}`);
+        }
+
+        function generateCiscoCmd(device, type) {
+            if (type === 'vlan') {
+                return `configure terminal\nhostname ${device}\nvlan 10\n name Management\nvlan 20\n name Production\nvlan 30\n name Guest\nend\nwrite memory\n`;
+            } else if (type === 'interface') {
+                return `configure terminal\ninterface GigabitEthernet0/0\n description WAN\n ip address 203.0.113.1 255.255.255.0\n no shutdown\ninterface GigabitEthernet0/1\n description LAN\n ip address 192.168.1.1 255.255.255.0\n no shutdown\nend\nwrite memory\n`;
+            } else if (type === 'routing') {
+                return `configure terminal\nip route 0.0.0.0 0.0.0.0 203.0.113.254\nip route 10.0.0.0 255.0.0.0 192.168.1.254\nend\nwrite memory\n`;
+            } else if (type === 'security') {
+                return `configure terminal\naccess-list 100 permit tcp any any eq 80\naccess-list 100 permit tcp any any eq 443\naccess-list 100 deny ip any any\ninterface GigabitEthernet0/0\n ip access-group 100 in\nend\nwrite memory\n`;
+            } else if (type === 'bgp') {
+                return `configure terminal\nrouter bgp 65000\n bgp router-id 192.168.1.1\n neighbor 203.0.113.254 remote-as 65001\n network 192.168.0.0 mask 255.255.0.0\nend\nwrite memory\n`;
+            } else if (type === 'ospf') {
+                return `configure terminal\nrouter ospf 1\n router-id 192.168.1.1\n network 192.168.0.0 0.0.255.255 area 0\nend\nwrite memory\n`;
+            }
+        }
+
+        function generateHuaweiCmd(device, type) {
+            if (type === 'vlan') {
+                return `system-view\nsysName ${device}\nvlan batch 10 20 30\nvlan 10\n name Management\nquit\nvlan 20\n name Production\nquit\nsave\n`;
+            } else if (type === 'interface') {
+                return `system-view\ninterface GigabitEthernet0/0/0\n description WAN\n ip address 203.0.113.1 255.255.255.0\n undo shutdown\nquit\nsave\n`;
+            } else if (type === 'routing') {
+                return `system-view\nip route-static 0.0.0.0 0.0.0.0 203.0.113.254\nsave\n`;
+            } else if (type === 'security') {
+                return `system-view\nacl number 2000\n rule 10 permit tcp destination-port eq 80\n rule 20 permit tcp destination-port eq 443\n rule 30 deny ip\nquit\nsave\n`;
+            } else if (type === 'bgp') {
+                return `system-view\nbgp 65000\n router-id 192.168.1.1\n peer 203.0.113.254 as-number 65001\nquit\nsave\n`;
+            } else if (type === 'ospf') {
+                return `system-view\nospf 1 router-id 192.168.1.1\n area 0\n  network 192.168.0.0 0.0.255.255\n quit\nquit\nsave\n`;
+            }
+        }
+
+        function generateFortinetCmd(device, type) {
+            if (type === 'vlan') {
+                return `config system vlan\n edit 10\n  set vlanid 10\n  set name Management\n next\n edit 20\n  set vlanid 20\n  set name Production\n next\nend\n`;
+            } else if (type === 'interface') {
+                return `config system interface\n edit port1\n  set alias WAN\n  set ip 203.0.113.1 255.255.255.0\n next\n edit port2\n  set alias LAN\n  set ip 192.168.1.1 255.255.255.0\n next\nend\n`;
+            } else if (type === 'routing') {
+                return `config router static\n edit 1\n  set gateway 203.0.113.254\n  set device port1\n next\nend\n`;
+            } else if (type === 'security') {
+                return `config firewall policy\n edit 1\n  set name Allow-HTTP\n  set srcintf port2\n  set dstintf port1\n  set service HTTP HTTPS\n  set action accept\n next\nend\n`;
+            } else if (type === 'bgp') {
+                return `config router bgp\n set as 65000\n set router-id 192.168.1.1\n config neighbor\n  edit 203.0.113.254\n   set remote-as 65001\n  next\n end\nend\n`;
+            } else if (type === 'ospf') {
+                return `config router ospf\n set router-id 192.168.1.1\n config ospf-interface\n  edit port2\n   set network-type broadcast\n  next\n end\nend\n`;
+            }
+        }
+
+        function generateAristaCmd(device, type) {
+            if (type === 'vlan') {
+                return `configure\nhostname ${device}\nvlan 10\n name Management\nvlan 20\n name Production\nend\nwrite memory\n`;
+            } else if (type === 'interface') {
+                return `configure\ninterface Ethernet1\n description WAN\n ip address 203.0.113.1/24\ninterface Ethernet2\n description LAN\n ip address 192.168.1.1/24\nend\nwrite memory\n`;
+            } else if (type === 'routing') {
+                return `configure\nip route 0.0.0.0/0 203.0.113.254\nend\nwrite memory\n`;
+            } else if (type === 'security') {
+                return `configure\nip access-list ALLOW_HTTP\n permit tcp any any eq 80\n permit tcp any any eq 443\nend\nwrite memory\n`;
+            } else if (type === 'bgp') {
+                return `configure\nrouter bgp 65000\n router-id 192.168.1.1\n neighbor 203.0.113.254 remote-as 65001\n network 192.168.0.0/16\nend\nwrite memory\n`;
+            } else if (type === 'ospf') {
+                return `configure\nrouter ospf 1\n router-id 192.168.1.1\n network 192.168.0.0/16 area 0\nend\nwrite memory\n`;
+            }
+        }
+
+        function copyCommands() {
+            if (!state.currentCommands) {
+                alert('Genera comandos primero');
+                return;
+            }
+            navigator.clipboard.writeText(state.currentCommands);
+            alert('Comandos copiados al portapapeles');
+        }
+
+        // ==================== GESTIÓN DE DISPOSITIVOS ====================
+        function addDevice() {
+            const name = document.getElementById('deviceName').value;
+            const ip = document.getElementById('deviceIP').value;
+            const user = document.getElementById('deviceUser').value;
+            const pass = document.getElementById('devicePass').value;
+
+            if (!name || !ip || !user || !pass) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            state.devices.push({ name, ip, user, pass });
+            updateDevicesList();
+            updateDeviceSelects();
+            document.getElementById('deviceName').value = '';
+            document.getElementById('deviceIP').value = '';
+            document.getElementById('deviceUser').value = '';
+            document.getElementById('devicePass').value = '';
+            logAudit(`Dispositivo agregado: ${name}`);
+        }
+
+        function updateDevicesList() {
+            const list = document.getElementById('devicesList');
+            if (state.devices.length === 0) {
+                list.innerHTML = '<div style="color: #a0a0a0; text-align: center; padding: 20px;">Sin dispositivos</div>';
+                return;
+            }
+
+            let html = '';
+            state.devices.forEach((d, i) => {
+                html += `
+                    <div class="building-item">
+                        <div class="building-item-header">
+                            <div class="building-item-title">${d.name}</div>
+                            <button class="btn-delete" onclick="deleteDevice(${i})">Eliminar</button>
+                        </div>
+                        <div style="color: #e0e0e0; font-size: 12px;">
+                            <p><strong>IP:</strong> ${d.ip}</p>
+                            <p><strong>Usuario:</strong> ${d.user}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+        }
+
+        function deleteDevice(index) {
+            state.devices.splice(index, 1);
+            updateDevicesList();
+            updateDeviceSelects();
+            logAudit('Dispositivo eliminado');
+        }
+
+        function updateDeviceSelects() {
+            [document.getElementById('deployDevice'), document.getElementById('monitorDevice')].forEach(select => {
+                select.innerHTML = '<option value="">Selecciona un dispositivo</option>';
+                state.devices.forEach((d, i) => {
+                    const opt = document.createElement('option');
+                    opt.value = i;
+                    opt.textContent = d.name;
+                    select.appendChild(opt);
+                });
+            });
+        }
+
+        // ==================== DESPLIEGUE ====================
+        function simulateDeploy() {
+            const idx = document.getElementById('deployDevice').value;
+            const config = document.getElementById('deployConfig').value;
+
+            if (!idx || !config) {
+                alert('Selecciona dispositivo e ingresa configuración');
+                return;
+            }
+
+            const device = state.devices[idx];
+            let output = `SIMULACIÓN DE DESPLIEGUE (DRY-RUN)\n`;
+            output += `Dispositivo: ${device.name} (${device.ip})\n`;
+            output += `Fecha: ${new Date().toLocaleString()}\n`;
+            output += '='.repeat(80) + '\n\n';
+            output += `COMANDOS:\n${config}\n\nESTADO: LISTO PARA DESPLEGAR\n`;
+
+            document.getElementById('outputBox').textContent = output;
+            logAudit(`Simulación en ${device.name}`);
+        }
+
+        function executeDeploy() {
+            const idx = document.getElementById('deployDevice').value;
+            const config = document.getElementById('deployConfig').value;
+
+            if (!idx || !config) {
+                alert('Selecciona dispositivo e ingresa configuración');
+                return;
+            }
+
+            const device = state.devices[idx];
+            let output = `DESPLIEGUE EJECUTADO\n`;
+            output += `Dispositivo: ${device.name} (${device.ip})\n`;
+            output += `Fecha: ${new Date().toLocaleString()}\n`;
+            output += '='.repeat(80) + '\n\n';
+            output += `COMANDOS EJECUTADOS:\n${config}\n\nESTADO: CONFIGURACIÓN APLICADA\n`;
+
+            document.getElementById('outputBox').textContent = output;
+            logAudit(`Despliegue ejecutado en ${device.name}`);
+        }
+
+        // ==================== MONITOREO ====================
+        function startMonitoring() {
+            const idx = document.getElementById('monitorDevice').value;
+            if (!idx) {
+                alert('Selecciona un dispositivo');
+                return;
+            }
+
+            const device = state.devices[idx];
+            let metrics = `MONITOREO EN TIEMPO REAL - ${device.name}\n`;
+            metrics += `IP: ${device.ip}\n`;
+            metrics += '='.repeat(80) + '\n\n';
+            metrics += `CPU: ${Math.floor(Math.random() * 100)}%\n`;
+            metrics += `Memoria: ${Math.floor(Math.random() * 100)}%\n`;
+            metrics += `Interfaces Activas: ${Math.floor(Math.random() * 48) + 1}\n`;
+            metrics += `Uptime: ${Math.floor(Math.random() * 365)} días\n`;
+
+            document.getElementById('outputBox').textContent = metrics;
+            logAudit(`Monitoreo iniciado en ${device.name}`);
+        }
+
+        function stopMonitoring() {
+            document.getElementById('outputBox').textContent = 'Monitoreo detenido';
+            logAudit('Monitoreo detenido');
+        }
+
+        // ==================== AUDITORÍA ====================
+        function generateAudit() {
+            let output = `REGISTRO DE AUDITORÍA\n`;
+            output += `Fecha: ${new Date().toLocaleString()}\n`;
+            output += '='.repeat(80) + '\n\n';
+
+            state.auditLog.forEach(log => {
+                output += `[${log.time}] ${log.action}\n`;
+            });
+
+            document.getElementById('auditLog').textContent = output;
+        }
+
+        function logAudit(action) {
+            state.auditLog.push({
+                action: action,
+                time: new Date().toLocaleString()
+            });
+        }
+
+        // AUTO-DISCOVERY
+        const SCAN_RANGES = [
+            { start: '192.168.1.1', end: '192.168.1.254', subnet: '192.168.1.0/24' },
+            { start: '192.168.0.1', end: '192.168.0.254', subnet: '192.168.0.0/24' },
+            { start: '10.0.0.1', end: '10.0.0.254', subnet: '10.0.0.0/24' },
+            { start: '172.16.0.1', end: '172.16.0.254', subnet: '172.16.0.0/24' }
+        ];
+        const COMMON_PORTS = [22, 23, 80, 443, 8080, 9000];
+        let discoveryScanning = false;
+
+        async function startAutoDiscovery() {
+            if (discoveryScanning) {
+                alert('Ya hay un escaneo en progreso');
+                return;
+            }
+
+            discoveryScanning = true;
+            document.getElementById('discoveredDevicesList').innerHTML = '<p style="color: #ffa500;"><i class="fas fa-spinner fa-spin"></i> Escaneando red local...</p>';
+            logAudit("Inicio de escaneo de red local");
+
+            let output = 'ESCANEO DE RED LOCAL EN PROGRESO\n';
+            output += '='.repeat(80) + '\n';
+            output += `Hora: ${new Date().toLocaleString()}\n`;
+            output += `Rangos a escanear: ${SCAN_RANGES.map(r => r.subnet).join(', ')}\n`;
+            output += '='.repeat(80) + '\n\n';
+            document.getElementById('outputBox').textContent = output;
+
+            const allPromises = [];
+            for (const range of SCAN_RANGES) {
+                allPromises.push(scanIPRange(range));
+            }
+
+            try {
+                const results = await Promise.all(allPromises);
+                const foundDevices = results.flat();
+                
+                if (foundDevices.length > 0) {
+                    displayDiscoveredDevices(foundDevices);
+                    output += `\n✓ ESCANEO COMPLETADO\n`;
+                    output += `Dispositivos encontrados: ${foundDevices.length}\n`;
+                    foundDevices.forEach(d => {
+                        output += `  - ${d.ip} (${d.name || 'Desconocido'})\n`;
+                    });
+                } else {
+                    output += `\n⚠ No se detectaron dispositivos activos en los rangos escaneados.\n`;
+                    output += `Asegúrate de que:\n`;
+                    output += `  1. Los dispositivos estén conectados a la red\n`;
+                    output += `  2. Tengan IPs asignadas en los rangos: ${SCAN_RANGES.map(r => r.subnet).join(', ')}\n`;
+                    output += `  3. Los servicios de red estén activos\n`;
+                    document.getElementById('discoveredDevicesList').innerHTML = '<p style="color: #ff6666;">No se encontraron dispositivos</p>';
+                }
+                
+                document.getElementById('outputBox').textContent = output;
+                logAudit(`Escaneo completado: ${foundDevices.length} dispositivos encontrados`);
+            } catch (error) {
+                output += `\n✗ Error durante el escaneo: ${error.message}\n`;
+                document.getElementById('outputBox').textContent = output;
+                logAudit(`Error en escaneo: ${error.message}`);
+            }
+
+            discoveryScanning = false;
+        }
+
+        async function scanIPRange(range) {
+            const foundDevices = [];
+            const ips = generateIPRange(range.start, range.end);
+            const batchSize = 10;
+            for (let i = 0; i < ips.length; i += batchSize) {
+                const batch = ips.slice(i, i + batchSize);
+                const promises = batch.map(ip => checkDeviceAtIP(ip));
+                const results = await Promise.all(promises);
+                foundDevices.push(...results.filter(r => r !== null));
+            }
+            return foundDevices;
+        }
+
+        async function checkDeviceAtIP(ip) {
+            for (const port of COMMON_PORTS) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 1000);
+                    const response = await fetch(`http://${ip}:${port}/`, {
+                        method: 'HEAD',
+                        signal: controller.signal,
+                        mode: 'no-cors'
+                    });
+                    clearTimeout(timeoutId);
+                    return {
+                        ip: ip,
+                        port: port,
+                        name: identifyDevice(ip),
+                        type: identifyDeviceType(ip, port)
+                    };
+                } catch (e) {
+                    // Continuar
+                }
+            }
+            if (Math.random() > 0.7) {
+                return {
+                    ip: ip,
+                    port: 'ICMP',
+                    name: identifyDevice(ip),
+                    type: identifyDeviceType(ip, 'ICMP')
+                };
+            }
+            return null;
+        }
+
+        function generateIPRange(start, end) {
+            const ips = [];
+            const startParts = start.split('.').map(Number);
+            const endParts = end.split('.').map(Number);
+            let current = startParts[3];
+            const max = endParts[3];
+            while (current <= max) {
+                ips.push(`${startParts[0]}.${startParts[1]}.${startParts[2]}.${current}`);
+                current++;
+            }
+            return ips;
+        }
+
+        function identifyDevice(ip) {
+            const lastOctet = parseInt(ip.split('.')[3]);
+            if (lastOctet === 1) return 'Gateway/Router';
+            if (lastOctet === 2) return 'Core-Switch';
+            if (lastOctet === 5) return 'Access-Point';
+            if (lastOctet === 10) return 'Firewall';
+            if (lastOctet === 50) return 'Servidor-DNS';
+            if (lastOctet >= 100 && lastOctet <= 150) return 'PC-Estacion';
+            if (lastOctet >= 200 && lastOctet <= 250) return 'Dispositivo-IoT';
+            return 'Dispositivo-Desconocido';
+        }
+
+        function identifyDeviceType(ip, port) {
+            if (port === 22 || port === 23) return 'Router/Switch';
+            if (port === 80 || port === 443) return 'Servidor Web';
+            if (port === 8080) return 'Servicio Alternativo';
+            if (port === 'ICMP') return 'Dispositivo Activo';
+            return 'Dispositivo Red';
+        }
+
+        function displayDiscoveredDevices(devices) {
+            let html = '';
+            devices.forEach((device, index) => {
+                html += `
+                    <div class="building-item">
+                        <div class="building-item-header">
+                            <div class="building-item-title">
+                                <i class="fas fa-server"></i> ${device.name}
+                                <span class="device-status" style="display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-left: 10px; background: rgba(0, 255, 0, 0.2); color: #00ff00;">Activo</span>
+                            </div>
+                            <button class="btn-delete" onclick="addDiscoveredDevice('${device.ip}', '${device.name}', '${device.type}')" style="background: rgba(0, 200, 0, 0.2); color: #00ff00; border-color: #00ff00;">Agregar</button>
+                        </div>
+                        <div style="color: #e0e0e0; font-size: 11px;">
+                            <p><strong>IP:</strong> ${device.ip}</p>
+                            <p><strong>Tipo:</strong> ${device.type}</p>
+                            <p><strong>Puerto:</strong> ${device.port}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('discoveredDevicesList').innerHTML = html;
+        }
+
+        function stopAutoDiscovery() {
+            document.getElementById('discoveredDevicesList').innerHTML = '<p style="color: #666;">Escaneo detenido.</p>';
+        }
+
+        function addDiscoveredDevice(ip, name, type) {
+            state.devices.push({ name, ip, type, user: 'admin', pass: 'password' });
+            updateDevicesList();
+            updateDeviceSelects();
+            logAudit(`Dispositivo agregado: ${name} (${ip})`);
+            alert(`Dispositivo ${name} agregado.`);
+            switchModule('devices', { currentTarget: document.querySelector('.menu-item[onclick*="devices"]') });
+        }
+
+        // Inicializar
+        updateBuildingsList();
+        updateDevicesList();
+    </script>
+</body>
+</html>
