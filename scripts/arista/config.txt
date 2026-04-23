@@ -1,1 +1,28 @@
+hostname Arista-Switch-01
+!
+vlan 10
+   name "Sales_VLAN"
+vlan 20
+   name "IT_VLAN"
+!
+interface Ethernet1
+   switchport mode access
+   switchport access vlan 10
+!
+interface Ethernet2
+   switchport mode access
+   switchport access vlan 20
+!
+interface Vlan10
+   ip address 192.168.10.1/24
+!
+management api http-https
+   no shutdown
+!
+management aaa authentication login default local
+management aaa authorization exec default local
+!
+username admin privilege 15 secret 5 $1$arista$arista
+!
+end
 
