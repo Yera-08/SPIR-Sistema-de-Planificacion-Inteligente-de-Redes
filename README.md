@@ -5,6 +5,7 @@
 SPIR v7.0 es una plataforma web integral diseñada para la planificación, automatización y gestión de infraestructuras de red. Desarrollada bajo el paradigma de Infraestructura como Código (IaC), esta herramienta permite a los ingenieros de red simular, configurar y monitorear dispositivos de red de manera eficiente, optimizando el flujo de trabajo y reduciendo errores manuales. Su última versión incorpora un avanzado motor de Detección Real de Dispositivos que permite interactuar con hardware físico en una red local, ofreciendo una experiencia práctica en la gestión de redes modernas.
 Este proyecto es ideal para entornos educativos y laboratorios, proporcionando una base sólida para comprender y aplicar principios de automatización de redes.
 
+
 ## Características Principales
 
 SPIR v7.0 se estructura en dos etapas fundamentales, ofreciendo un conjunto robusto de funcionalidades:
@@ -21,6 +22,7 @@ SPIR v7.0 se estructura en dos etapas fundamentales, ofreciendo un conjunto robu
 
 • **Generador de Comandos Multimarca:** Produce comandos de configuración específicos para diferentes fabricantes (Cisco IOS/IOS-XE, Huawei VRP, Fortinet FortiOS, Arista EOS), asegurando la compatibilidad y reduciendo la curva de aprendizaje.
 
+
 **Etapa 2: Automatización y Operaciones**
 
 • **Auto-Discovery Real de Dispositivos:** Una característica innovadora que permite a la plataforma escanear la red local y detectar dispositivos físicos (routers, switches, APs) conectados al PC. Utiliza peticiones HTTP/S a puertos comunes y rangos IP predefinidos para identificar equipos activos.
@@ -33,6 +35,7 @@ SPIR v7.0 se estructura en dos etapas fundamentales, ofreciendo un conjunto robu
 
 • **Auditoría Completa:** Registra todas las acciones y cambios realizados en la plataforma, garantizando la trazabilidad y facilitando la resolución de problemas.
 
+
 ## Arquitectura del Sistema
 
 El sistema está construido como una Single Page Application (SPA) contenida en un único archivo HTML, lo que facilita su portabilidad y ejecución:
@@ -42,6 +45,7 @@ El sistema está construido como una Single Page Application (SPA) contenida en 
 • **CSS:** Estilos y diseño responsivo, adaptándose a diferentes tamaños de pantalla.
 
 • **JavaScript (Vanilla JS):** Lógica de negocio, simulación de operaciones de red, manipulación del DOM y gestión de estado.
+
 
 ## Módulos del Sistema
 
@@ -61,6 +65,7 @@ La interacción con SPIR v7.0 se realiza a través de módulos intuitivos:
 
 **7. Auditoría:** Revisa el Registro de Auditoría para mantener un control de todas las acciones realizadas en la plataforma.
 
+
 ## Tecnologías Utilizadas
 
 • **Frontend:** HTML5, CSS3, JavaScript (Vanilla JS)
@@ -73,11 +78,14 @@ La interacción con SPIR v7.0 se realiza a través de módulos intuitivos:
 
 • **Metodologías:** Infraestructura como Código (IaC), Fuente Única de Verdad (SoT), Desarrollo Iterativo.
 
+
 ## Historial de Versiones
 
 La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo funcionalidades y mejorando la experiencia de usuario en cada etapa:
 
+
 **Versión 1.0 (Planificación Básica):**
+
 
 • **Funcionalidad:** Implementación inicial de la planificación de direcciones IP y segmentación VLAN. Interfaz de usuario simple con campos de entrada y salida de texto básicos.
 
@@ -85,7 +93,9 @@ La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo
 
 • **Enfoque:** Demostración de la capacidad de generar planes de red estáticos.
 
+
 **Versión 2.0 (Interfaz Tabulada):**
+
 
 • **Funcionalidad:** Introducción de una interfaz basada en pestañas para organizar las funcionalidades de planificación IP y VLAN. Mejora en la presentación de resultados.
 
@@ -93,7 +103,9 @@ La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo
 
 • **Enfoque:** Mejora de la usabilidad y organización de las herramientas.
 
+
 **Versión 3.0 (Generador de Comandos):**
+
 
 • **Funcionalidad:** Incorporación del primer generador de comandos para configuraciones de red básicas. Se añadió la capacidad de generar comandos para VLANs e interfaces.
 
@@ -101,7 +113,9 @@ La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo
 
 • **Enfoque:** Transición de la planificación a la automatización de la configuración.
 
+
 **Versión 4.0 (Gestión de Edificios y Sidebar):**
+
 
 • **Funcionalidad:** Introducción de la gestión de edificios para organizar la infraestructura por ubicaciones. Se implementó una barra lateral (sidebar) para una navegación más estructurada entre módulos.
 
@@ -109,7 +123,9 @@ La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo
 
 • **Enfoque:** Escalabilidad y modularidad de la plataforma.
 
+
 **Versión 5.0 (Diseño Profesional Oscuro):**
+
 
 • **Funcionalidad:** Rediseño completo de la interfaz de usuario con un tema oscuro profesional. Consolidación de módulos como Topología Visual, Despliegue y Monitoreo (simulados).
 
@@ -117,7 +133,9 @@ La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo
 
 • **Enfoque:** Mejora significativa de la experiencia de usuario y estética visual.
 
+
 **Versión 6.0 (Auto-Discovery Inicial y Multimarca):**
+
 
 • **Funcionalidad:** Integración de la primera versión del módulo Auto-Discovery para detectar dispositivos en la red local. Ampliación del generador de comandos para soportar múltiples fabricantes (Cisco, Huawei, HP).
 
@@ -125,13 +143,16 @@ La plataforma SPIR ha evolucionado a través de un proceso iterativo, añadiendo
 
 • **Enfoque:** Introducción de capacidades de detección y compatibilidad con diversos equipos.
 
+
 **Versión 7.0 (Detección Directa y Refinada):**
+
 
 • **Funcionalidad:** Optimización del Auto-Discovery para una detección más directa y precisa de hardware de red real (Switches, Routers, Patch Panels). Eliminación de mensajes de error de bloqueo y mejora de la visibilidad de los selectores de fabricantes y enrutamiento. Soporte específico para Cisco IOS/IOS-XE, Fortinet FortiOS, Huawei VRP y Arista EOS.
 
 • **Tecnologías:** Refinamiento de la lógica de escaneo y filtrado de dispositivos, ajustes CSS para visibilidad de elementos de formulario.
 
 • **Enfoque:** Robustez, precisión y experiencia de usuario sin interrupciones en la detección y configuración.
+
 
 ## Confiabilidad de la Herramienta
 
@@ -145,6 +166,7 @@ La confiabilidad de SPIR v7.0 se basa en la aplicación rigurosa de principios d
 
 **4. Auditoría y Trazabilidad:** El registro de auditoría integrado proporciona una bitácora detallada de todas las acciones realizadas, lo que permite verificar la integridad de las operaciones y facilita la depuración en caso de inconsistencias.
 
+
 ## Cómo usar el sistema
 
 Este proyecto es una aplicación web autónoma contenida en un único archivo HTML. No requiere instalación de servidores o dependencias complejas.
@@ -153,9 +175,11 @@ Este proyecto es una aplicación web autónoma contenida en un único archivo HT
 
 • **Abre en el Navegador:** Simplemente abre el archivo Sistema de Planificación Inteligente de Redes v7.html con tu navegador web preferido (Chrome, Firefox, Edge, etc.).
 
+
 ## Limitaciones
 
 • La aplicación funciona completamente en el frontend (sin backend ni base de datos)
+
 • No se cuenta con autenticación de usuarios ni control de acceso
 
 
